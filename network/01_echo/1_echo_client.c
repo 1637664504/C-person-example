@@ -10,7 +10,7 @@
 int tcp_connect(int port,char *ip)
 {
 	int fd;
-	struct sockaddr_in ser_addr;
+	struct sockaddr_in serv_addr;
 
 	fd = socket(AF_INET,SOCK_STREAM,0);
 	if(fd < 0){
@@ -18,12 +18,13 @@ int tcp_connect(int port,char *ip)
 		exit(1);
 		
 	}
-	memset(&ser_addr,0,sizeof(ser_addr));
-	ser_addr.sin_family = AF_INET;
-	ser_addr.sin_port = htons(port);
-	ser_addr.sin_addr.s_addr = inet_addr(ip);
+	memset(&serv_addr,0,sizeof(serv_addr));
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = htons(port);
+	serv_addr.sin_addr.s_addr = inet_addr(ip);
+	printf("liuj-- ip=%s\n",ip);
 
-	if(connect(fd,(struct sockaddr *)&ser_addr,sizeof(ser_addr)) == -1){
+	if(connect(fd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) == -1){
 		perror("connect fail");
 		exit(1);
 	}
@@ -47,6 +48,8 @@ int echo_client(int sock)
 	//}
 }
 
+char DEFAULT_IP[64]="127.0.0.1";
+int DEFAULT_PORT=6655;
 int main(int argc,char *argv[])
 {
 	int sock;
@@ -56,13 +59,15 @@ int main(int argc,char *argv[])
 
 	if(argc !=3){
 		printf("usage:%s <port> <port>\n",argv[0]);
-		exit(1);
+		ser_port=DEFAULT_PORT;
+		ser_ip=DEFAULT_IP;
 		
+	}else if(argc==3){
+		ser_port = atoi(argv[1]);
+		ser_ip = argv[2];
 	}
-	ser_port = atoi(argv[1]);
-	ser_ip = argv[2];
 	sock = tcp_connect(ser_port,ser_ip);
-	echo_client(sock);
+	//echo_client(sock);
 
 }
 

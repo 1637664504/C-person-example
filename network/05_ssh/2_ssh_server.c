@@ -1,3 +1,6 @@
+/*
+验证多个计算器 客户端登录情况
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,6 +9,8 @@
 #include <sys/socket.h>
 
 #define BUF_LEN 1024
+char DEFAULT_IP[64]="127.0.0.1";
+int DEFAULT_PORT=6655;
 
 int tcp_listen_init(int port,char *ip)
 {
@@ -53,22 +58,58 @@ int get_accept_fd(int ser_sock)
 	return fd;
 }
 
-int echo_server(int ser_sock)
+int do_someting(int sock)
+{
+	char recvbuf[1024] = {0};
+	char sendbuf[1024] = {0};
+	int a,b,ret,len;
+	char opt;
+
+	close(0);
+	while((len = read(sock,recvbuf,BUF_LEN)) > 0){
+		dup2(sock,1);
+		fprintf(stderr,"cmd:%s\n",recvbuf);
+		system(recvbuf);
+
+		memset(recvbuf,0,BUF_LEN);
+		fprintf(stderr,"=====\n");
+		//len=sprintf(sendbuf,"%d",ret);
+		//write(sock,sendbuf,len);
+	}
+	printf("END--------\n");
+
+	return len;
+}
+
+int child_process(int fd)
+{
+	int len = 0;
+	char buf[BUF_LEN]={0};
+
+	do_someting(fd);
+
+	exit(0);
+}
+
+int do_main(int ser_sock)
 {
 	int fd;
-	int len;
+	int pid;
+	int count=1;
 	while(1){
-		char buf[BUF_LEN]={0};
+
 		fd = get_accept_fd(ser_sock);
-		len = read(fd,buf,BUF_LEN);
-		printf("rcv:%s\n",buf);
-		write(fd,buf,len);
+		if((pid= fork()) < 0){
+			perror("fork fail");
+			exit(1);
+		}else if(pid == 0){
+			child_process(fd);
+		}
+		printf("new child process: %d\n",count++);
+		
 	}
 	
 }
-
-char DEFAULT_IP[64]="127.0.0.1";
-int DEFAULT_PORT=6655;
 
 int main(int argc,char *argv[])
 {
@@ -80,15 +121,15 @@ int main(int argc,char *argv[])
 	if(argc !=3){
 		printf("usage:%s <port> <port>\n",argv[0]);
 		ser_port=DEFAULT_PORT;
-		ser_ip=DEFAULT_IP;
+		//ser_ip=DEFAULT_IP;
 		
-	}else if(argc==3){
+	}else if(argc==2){
 		ser_port = atoi(argv[1]);
-		ser_ip = argv[2];
+		//ser_ip = argv[2];
 	}
 
 	sock = tcp_listen_init(ser_port,ser_ip);
-	echo_server(sock);
+	do_main(sock);
 
 	return 0;
 }

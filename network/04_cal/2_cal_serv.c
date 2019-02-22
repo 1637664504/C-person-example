@@ -53,23 +53,78 @@ int get_accept_fd(int ser_sock)
 	return fd;
 }
 
-int echo_server(int ser_sock)
+int do_cal(char opt,int a,int b)
+{
+	int ret;
+	switch (opt){
+	case '+':
+		ret=a+b; break;
+	case '-':
+		ret=a-b; break;
+	case '*':
+		ret=a*b; break;
+	case '/':
+		ret=a/b; break;
+	default:
+		ret = '?'; break;
+	}
+
+	return ret;
+}
+
+int do_someting(int sock)
+{
+	char recvbuf[1024] = {0};
+	char sendbuf[1024] = {0};
+	int a,b,ret,len;
+	char opt;
+
+	read(sock,recvbuf,BUF_LEN);
+	ret = sscanf(recvbuf,"%d %c %d",&a,&opt,&b);
+	if(ret < 3){
+		write(sock,"error",5);
+		return -1;
+	}
+	ret = do_cal(opt,a,b);
+	len=sprintf(sendbuf,"%d",ret);
+	write(sock,sendbuf,len);
+
+	return len;
+}
+
+int child_process(int fd)
+{
+	int len = 0;
+	char buf[BUF_LEN]={0};
+
+	do_someting(fd);
+
+
+	exit(0);
+}
+
+int do_main(int ser_sock)
 {
 	int fd;
-	int len;
+	int pid;
+	int count=1;
 	while(1){
-		char buf[BUF_LEN]={0};
+
 		fd = get_accept_fd(ser_sock);
-		len = read(fd,buf,BUF_LEN);
-		printf("rcv:%s\n",buf);
-		write(fd,buf,len);
+		if((pid= fork()) < 0){
+			perror("fork fail");
+			exit(1);
+		}else if(pid == 0){
+			child_process(fd);
+		}
+		printf("new child process: %d\n",count++);
+		
 	}
 	
 }
 
 char DEFAULT_IP[64]="127.0.0.1";
 int DEFAULT_PORT=6655;
-
 int main(int argc,char *argv[])
 {
 	int sock;
@@ -88,7 +143,7 @@ int main(int argc,char *argv[])
 	}
 
 	sock = tcp_listen_init(ser_port,ser_ip);
-	echo_server(sock);
+	do_main(sock);
 
 	return 0;
 }
