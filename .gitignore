@@ -53,7 +53,7 @@ dkms.conf
 
 #automake
 *.log
-*.scan
+#*.scan
 
 # liujiang customer
 include/*
