@@ -61,3 +61,5 @@ inc
 a.out
 1
 2
+.vscode/*
+libz/examples

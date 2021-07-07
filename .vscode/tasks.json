@@ -9,6 +9,7 @@
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
                 "-g",
+                "-lz"
             ],
             //"command": "make",
             //"args": ["demo2"],
