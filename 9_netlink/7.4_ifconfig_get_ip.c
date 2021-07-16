@@ -5,6 +5,47 @@
 #include <stdio.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <errno.h>
+
+int jrd_sys_get_wan_ip(char *wan_ip, int size)
+{
+    int sock = 0;
+    struct ifreq ifr;
+    int wan_type = 0;
+    
+    if (wan_ip == NULL || size < 16)
+    {
+        return -1;
+    }
+
+    if((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+        printf( "create sock fail; %s\n",strerror(errno));
+        return 0;
+    }
+
+    memset(&ifr,0,sizeof(ifr));
+    strcpy(ifr.ifr_name, "eth1");
+    if (ioctl(sock, SIOCGIFADDR, &ifr) <  0)
+    {
+        printf("ioctl get addr fail: %s\n",strerror(errno));
+        return 0;
+    }
+    strncpy(wan_ip,inet_ntoa(((struct sockaddr_in*)&(ifr.ifr_addr))->sin_addr),size);
+
+    return 0;
+}
+
+#if 1
+int main()
+{
+        int inet_sock={0};
+        char wan_ip[64]={0};
+    jrd_sys_get_wan_ip(wan_ip,64);
+    printf("wan=%s \n",wan_ip);
+        return 0;
+}
+#else
 int main()
 {
         int inet_sock={0};
@@ -14,7 +55,7 @@ int main()
          struct sockaddr_in *ifc_addr = NULL;
         inet_sock = socket(AF_INET, SOCK_DGRAM, 0);
  
-        strcpy(ifr.ifr_name, "eth2");
+        strcpy(ifr.ifr_name, "eth1");
         //SIOCGIFADDR标志代表获取接口地址
         if (ioctl(inet_sock, SIOCGIFADDR, &ifr) <  0)
                 perror("ioctl error");
@@ -25,3 +66,4 @@ int main()
         printf("wan_ip=%s, in_addr=%s\n", wan_ip,inet_ntoa(addr));
         return 0;
 }
+#endif

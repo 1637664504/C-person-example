@@ -1,9 +1,3 @@
-/*
- * NetMonitor.c
- *
- *  Created on: 2015年4月25日
- *      Author: tao
- */
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -22,18 +16,7 @@
 #define t_assert(x) { \
 	if(!(x))  {err = -__LINE__;goto error;} \
 }
- 
-/*Ctrl + C 退出*/
-static volatile int keepRunning = 1;
- 
-void intHandler(int dummy)
-{
-	keepRunning = 0;
-}
- 
-/**
- * 解析RTA,并存入tb
- */
+
 void parse_rtattr(struct rtattr **tb, int max, struct rtattr *attr, int len)
 {
 	for (; RTA_OK(attr, len); attr = RTA_NEXT(attr, len)) {
@@ -43,10 +26,7 @@ void parse_rtattr(struct rtattr **tb, int max, struct rtattr *attr, int len)
 	}
 }
  
-/**
- * 显示连接信息
- * 当网卡变动的时候触发这个信息,例如插/拔网线,增/减网卡设备,启用/禁用接口等.
- */
+
 void print_ifinfomsg(struct nlmsghdr *nh)
 {
 	int len;
@@ -62,64 +42,8 @@ void print_ifinfomsg(struct nlmsghdr *nh)
 	}
 	printf("\n");
 }
- 
-/**
- * 显示地址信息
- * 当地址变动的时候触发这个信息,例如通过DHCP获取到地址后
- */
-void print_ifaddrmsg(struct nlmsghdr *nh)
-{
-	int len;
-	struct rtattr *tb[IFA_MAX + 1];
-	struct ifaddrmsg *ifaddr;
-	char tmp[256];
-	bzero(tb, sizeof(tb));
-	ifaddr = NLMSG_DATA(nh);
-	len = nh->nlmsg_len - NLMSG_SPACE(sizeof(*ifaddr));
-	parse_rtattr(tb, IFA_MAX, IFA_RTA (ifaddr), len);
- 
-	printf("222 addr new/del %s ", (nh->nlmsg_type==RTM_NEWADDR)?"NEWADDR":"DELADDR");
-	if (tb[IFA_LABEL] != NULL) {
-		printf("%s ", RTA_DATA(tb[IFA_LABEL]));
-	}
-	if (tb[IFA_ADDRESS] != NULL) {
-		inet_ntop(ifaddr->ifa_family, RTA_DATA(tb[IFA_ADDRESS]), tmp, sizeof(tmp));
-		printf("%s ", tmp);
-	}
-	printf("\n");
-}
- 
-/**
- * 显示路由信息
- * 当路由变动的时候触发这个信息
- */
-void print_rtmsg(struct nlmsghdr *nh)
-{
-	int len;
-	struct rtattr *tb[RTA_MAX + 1];
-	struct rtmsg *rt;
-	char tmp[256];
-	bzero(tb, sizeof(tb));
-	rt = NLMSG_DATA(nh);
-	len = nh->nlmsg_len - NLMSG_SPACE(sizeof(*rt));
-	parse_rtattr(tb, RTA_MAX, RTM_RTA(rt), len);
-	printf("333 route %s: ", (nh->nlmsg_type==RTM_NEWROUTE)?"NEWROUT":"DELROUT");
-	if (tb[RTA_DST] != NULL) {
-		inet_ntop(rt->rtm_family, RTA_DATA(tb[RTA_DST]), tmp, sizeof(tmp));
-		printf("RTA_DST %s ", tmp);
-	}
-	if (tb[RTA_SRC] != NULL) {
-		inet_ntop(rt->rtm_family, RTA_DATA(tb[RTA_SRC]), tmp, sizeof(tmp));
-		printf("RTA_SRC %s ", tmp);
-	}
-	if (tb[RTA_GATEWAY] != NULL) {
-		inet_ntop(rt->rtm_family, RTA_DATA(tb[RTA_GATEWAY]), tmp, sizeof(tmp));
-		printf("RTA_GATEWAY %s ", tmp);
-	}
- 
-	printf("\n");
-}
-int main(int argc, char *argv[])
+
+int jrd_netlink_monito(int argc, char *argv[])
 {
 	int socket_fd;
 	int err = 0;
@@ -133,7 +57,7 @@ int main(int argc, char *argv[])
  
 	int len = BUFLEN;
 	char buff[2048];
-	signal(SIGINT, intHandler);
+	//signal(SIGINT, intHandler);
  
 	/*打开NetLink Socket*/
 	socket_fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
@@ -147,7 +71,7 @@ int main(int argc, char *argv[])
 	sa.nl_groups = RTMGRP_LINK;
 	t_assert(!bind(socket_fd, (struct sockaddr *) &sa, sizeof(sa)));
  
-	while (keepRunning) {
+	while (1) {
 		FD_ZERO(&rd_set);
 		FD_SET(socket_fd, &rd_set);
 		timeout.tv_sec = 5;
@@ -157,36 +81,23 @@ int main(int argc, char *argv[])
 			perror("select");
 		}
 		else if(select_r == 0){
-				printf("444 timeout --\n");
-				continue;
+			printf("444 timeout --\n");
+			continue;
 		}
 		else if (select_r > 0) {
 			if (FD_ISSET(socket_fd, &rd_set)) {
 				read_r = read(socket_fd, buff, sizeof(buff));
 				for (nh = (struct nlmsghdr *) buff; NLMSG_OK(nh, read_r); nh = NLMSG_NEXT(nh, read_r)) {
 					switch (nh->nlmsg_type) {
-					default:
-						/*收到些奇怪的信息*/
-						printf("nh->nlmsg_type = %d\n", nh->nlmsg_type);
-						break;
-					case NLMSG_DONE:
-					case NLMSG_ERROR:
-						printf("555 nh->nlmsg_type = %d\n", nh->nlmsg_type);
-						break;
 					case RTM_NEWLINK:
 					case RTM_DELLINK:
 						print_ifinfomsg(nh);
 						break;
-					case RTM_NEWADDR:
-					case RTM_DELADDR:
-						print_ifaddrmsg(nh);
-						break;
-					case RTM_NEWROUTE:
-					case RTM_DELROUTE:
-						print_rtmsg(nh);
+					default:
+						/*收到些奇怪的信息*/
+						printf("nh->nlmsg_type = %d\n", nh->nlmsg_type);
 						break;
 					}
- 
 				}
 			}
 		}
