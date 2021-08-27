@@ -10,7 +10,7 @@ int main()
         int inet_sock={0};
         struct ifreq ifr;
         //struct mac_addr;
-        unsignedchar mac[IFHWADDRLEN]={0};
+        unsigned char mac[IFHWADDRLEN]={0};
         inet_sock = socket(AF_INET, SOCK_DGRAM, 0);
  
         strcpy(ifr.ifr_name, "eth2");
