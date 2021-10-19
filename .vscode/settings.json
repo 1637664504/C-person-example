@@ -1,6 +1,7 @@
 {
     "C_Cpp.errorSquiggles": "Disabled",
     "files.associations": {
-        "inotify.h": "c"
+        "inotify.h": "c",
+        "stdlib.h": "c"
     }
 }
