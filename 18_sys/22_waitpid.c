@@ -7,7 +7,8 @@
 int main ( int argc, char *argv[] )
 {
     char cmd[64]={0};
-    int ret,tmp;
+    int status = 0;
+    int exit_code = 0;
     pid_t pid, pid_ret;
     sprintf(cmd,"ls -l");
 
@@ -16,17 +17,19 @@ int main ( int argc, char *argv[] )
         printf("fork failed\n");
         exit(1);
     }else if(pid ==0){
-        printf("child 111111111\n");
+        printf("child 111111111 pid=%u\n",getpid());
+        exit(-1);
     }
 
-    pid_ret = waitpid(pid,&ret,0);
+    pid_ret = waitpid(pid,&status,0);
 
-    if(WIFEXITED(ret)){
-        tmp = WEXITSTATUS(ret);
-        printf("pid_ret=%d, ret=%d, tmp=%d\n",pid_ret, ret,tmp);
-    }else if(WIFSIGNALED(ret)){
-        ret = WTERMSIG(ret);
-        printf("kill child sig =%d\n",ret);
+    if(WIFEXITED(status)){
+        exit_code = WEXITSTATUS(status);
+        printf("pid_ret=%d, ret=%d, exit_code=%d\n",pid_ret, status, exit_code);
+        printf("child exit with %d\n", WEXITSTATUS(status));
+    }else if(WIFSIGNALED(status)){
+        status = WTERMSIG(status);
+        printf("kill child sig =%d\n",status);
     }
     printf("22222222222\n");
 	return 0;

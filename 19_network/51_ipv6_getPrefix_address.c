@@ -55,7 +55,8 @@ void jrd_router_ipv6_get_prefix_address(char *address,int prefix, char *prefix_a
     {
         strncpy(tmp,address,39);
     }
-    sscanf(tmp,"%4s:%4s:%4s:%4s:%4s:%4s:%4s:%4s",ipv6_slice[0],ipv6_slice[1],ipv6_slice[2],ipv6_slice[3],ipv6_slice[4],ipv6_slice[5],ipv6_slice[6],ipv6_slice[7]);
+    //sscanf(tmp,"%4s:%4s:%4s:%4s:%4s:%4s:%4s:%4s",ipv6_slice[0],ipv6_slice[1],ipv6_slice[2],ipv6_slice[3],ipv6_slice[4],ipv6_slice[5],ipv6_slice[6],ipv6_slice[7]);
+    sscanf(tmp,"%[^:]:%[^:]:%[^:]:%[^:]:%[^:]:%[^:]:%[^:]:%[^:]",ipv6_slice[0],ipv6_slice[1],ipv6_slice[2],ipv6_slice[3],ipv6_slice[4],ipv6_slice[5],ipv6_slice[6],ipv6_slice[7]);
 
     int i,n,m;
     unsigned short hex = 0;
@@ -82,9 +83,9 @@ void jrd_router_ipv6_get_prefix_address(char *address,int prefix, char *prefix_a
 
 int main(int argc, char *argv[])
 {
-    char addr[256] = "2408:8557:3031:2339:16a9:7548:be65:e484";
+    char addr[256] = "240e:47c:30a8:7fee:16af:f622:90cf:8477";
     char addr2[256] = "2408:8557:3031:2339::e484";
-    int prefix = 60;
+    int prefix = 64;
     char prefix_address[40];
     jrd_router_ipv6_get_prefix_address(addr,prefix,prefix_address);
     jrd_router_ipv6_get_prefix_address(addr2,prefix,prefix_address);

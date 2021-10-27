@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include <json.h>
+#include <json-c/json.h>
 int main ()
 {
     json_object *pobj = NULL;

@@ -111,16 +111,13 @@ int sys_get_nameserver_list(char (*dns_list)[64], int num, const char *dns_file,
                     strcpy(dns_list[i],address);
                     i++;
                 }
+                #if 0   //无用代码
                 else if(address_type == type)
                 {
                     strcpy(dns_list[i],address);
                     i++;
                 }
-                else if(address_type == type)
-                {
-                    strcpy(dns_list[i],address);
-                    i++;
-                }
+                #endif
             }
         }
     }
@@ -138,7 +135,7 @@ int main(int argc, char *argv[])
 
     char dns_list[4][64] = {0};
     int ret = 0;
-    ret = sys_get_nameserver_list(dns_list,4,dns_file,IPV4_TYPE_ENUM);
+    ret = sys_get_nameserver_list(dns_list,4,dns_file,IP_TYPE_ALL);
     for(int i=0;i<ret;i++){
         printf("%s\n",dns_list[i]);
     }
