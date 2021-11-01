@@ -19,7 +19,7 @@ int main ( int argc, char *argv[] )
         sleep(2);
         printf("input a number");
     }
-    free(p);
+    //free(p);
     return 0;
 }
 

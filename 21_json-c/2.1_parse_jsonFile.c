@@ -30,9 +30,10 @@ int main ()
         printf("14 %s,mask=%d\n",address,mask);
     }
 
-    json_object_put(address_obj);
-    json_object_put(mask_obj);
-    json_object_put(ipv6_address_obj);
+    //只需要释放 根obj即可
+    //json_object_put(address_obj);
+    //json_object_put(mask_obj);
+    //json_object_put(ipv6_address_obj);
     json_object_put(pobj);
 
     return 0;

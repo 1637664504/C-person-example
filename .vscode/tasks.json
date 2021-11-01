@@ -9,7 +9,7 @@
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
                 "-g",
-                "-ljson-c", "-I", "/usr/include/json-c"
+                "-ljson-c", "-lpthread"
             ],
             //"command": "make",
             //"args": ["demo2"],
