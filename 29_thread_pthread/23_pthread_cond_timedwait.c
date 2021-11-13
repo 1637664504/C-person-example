@@ -12,14 +12,20 @@ static pthread_cond_t g_cond = PTHREAD_COND_INITIALIZER;
 void *thread_handler(void *ptr)
 {
     struct timespec abstime;
+    int ret;
 
     memset(&abstime,0,sizeof(abstime));
     abstime.tv_sec = time(NULL) + 5;
     printf("thread 11111111 +++++++\n");
-    pthread_cond_timedwait(&g_cond, &g_mutex, &abstime);
-    printf("thread 22222222 +++++++\n");
-
+    //pthread_cond_wait(&g_cond, &g_mutex);         //1.一直等待
+    ret = pthread_cond_timedwait(&g_cond, &g_mutex, &abstime);  //2.超时5s 推出
     pthread_mutex_unlock(&g_mutex);
+    if(ret == ETIMEDOUT)
+    {
+        
+    }
+    printf("thread 22222222 +++++++\n");
+    
 }
 
 int create_pthread(void)
@@ -37,12 +43,12 @@ int create_pthread(void)
     pthread_detach(tid);  //1. 不阻塞，线程独立运行
     //pthread_join(tid,&ret); //2. 阻塞，直到子线程结束， **ret保持线程返回值
     printf("main thread ----\n");
-    for(int i=0;i<10;i++){
+    for(int i=0;i<2;i++){
         sleep(1);
         printf("main thread %d----\n",i);
     }
-    //pthread_cond_broadcast(&g_cond);
-    sleep(10);
+    pthread_cond_broadcast(&g_cond);
+    //sleep(10);
     return tid;
 }
 

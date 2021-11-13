@@ -1,31 +1,66 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 
+void test2(void)
+{
+    int ret,status,finish;
+
+    //2. 不存在的文件
+    ret = system("ls 123aa.txt");
+    if(ret)
+        printf("ret=%d ,err=%s\n",ret,strerror(errno));
+    if(WIFEXITED(status)){
+        finish= WIFEXITED(status);
+        printf("child exit with %d. Finish=%d\n", WEXITSTATUS(status),finish);
+    }
+
+}
+
+void test3(void)
+{
+    int ret,status,finish;
+
+    //3. 不存在的命令
+    ret = system("catt 123aa.txt");
+    if(ret)
+        printf("ret=%d ,err=%s\n",ret,strerror(errno));
+    if(WIFEXITED(status)){
+        finish= WIFEXITED(status);
+        printf("child exit with %d. Finish=%d\n", WEXITSTATUS(status),finish);
+    }
+
+}
+
+
 int main(void)
 {
-    pid_t pid, wpid;
-    int status;
+    pid_t wait_pid;
+    int ret,status,finish;
 
-    execle("ls 123");
-    {           //父进程
-        wpid = wait(&status);   //等待回收子进程
-        if(wpid == -1){
-            perror("wait error:");
-            exit(1);
-        }
-        //正常退出判断
-        if(WIFEXITED(status)){
-            printf("child exit with %d\n", WEXITSTATUS(status));
-        }
+    //1. normal script
+    ret = system("ls ~");
 
-        //因为某种信号中断获取状态
-        if(WIFSIGNALED(status)){
-            printf("child killed by %d\n", WTERMSIG(status));
-        }
-     }
-    printf("parent pid = %d, sonpid = %d\n", getpid(), pid);
+    /* 运行错误: 提示不存在子进程
+    wait_pid = wait(&status);   //等待回收子进程
+    if(wait_pid == -1){
+        perror("wait error:");
+        exit(1);
+    }
+    */
+    if(ret)
+        printf("ret=%d ,err=%s\n",ret,strerror(errno));
+    if(WIFEXITED(status)){
+        finish= WIFEXITED(status);
+        printf("child exit with %d. Finish=%d\n", WEXITSTATUS(status),finish);
+    }
+
+    test2();
+    test3();
+
     return 0;
 }

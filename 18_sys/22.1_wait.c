@@ -11,7 +11,7 @@ int main(void)
 
     pid = fork();
     if(pid == 0){               //子进程
-        printf("child --- my parent is %d, pid=^d\n", getppid(),getpid());
+        printf("child --- my parent is %u, pid=%u\n", getppid(),getpid());
         exit(0);              //子进程睡眠30秒
         printf("child is die\n");
      }else if(pid>0){           //父进程
