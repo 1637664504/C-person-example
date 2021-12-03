@@ -3,6 +3,7 @@
     "files.associations": {
         "inotify.h": "c",
         "stdlib.h": "c",
-        "array": "c"
+        "array": "c",
+        "pthread.h": "c"
     }
 }

@@ -14,14 +14,14 @@ int IsValidIP(const char *ip, int type)
 {
     if (ip == NULL) return 0;
 
-    int result = 0;
+    int result = -1;
 
     if (type == IPV4_TYPE_ENUM) {
         struct in_addr s;
-        result = inet_pton(AF_INET, (char *)ip, (void *)&s);
+        result = inet_pton(AF_INET, ip, (void *)&s);
     } else if (type == IPV6_TYPE_ENUM) {
         struct in6_addr s;
-        result = inet_pton(AF_INET6, (char *)ip, (void *)&s);
+        result = inet_pton(AF_INET6, ip, (void *)&s);
     }
     return result;
 }
@@ -29,9 +29,9 @@ int IsValidIP(const char *ip, int type)
 int get_ip_type(const char *ip)
 {
     int ret = IP_INVALID;
-    if(strchr(ip,'.') && (IsValidIP(ip,CHECK_IPV4) == IPV4_TYPE_ENUM))
+    if(strchr(ip,'.') && (IsValidIP(ip,IPV4_TYPE_ENUM) == 1))
         ret = IPV4_TYPE_ENUM;
-    else if(strchar(ip,':') && (IsValidIP(ip,CHECK_IPV4) == IPV6_TYPE_ENUM))
+    else if(strchr(ip,':') && (IsValidIP(ip,IPV6_TYPE_ENUM) == 1))
         ret = IPV6_TYPE_ENUM;
 
     return ret;
@@ -39,17 +39,10 @@ int get_ip_type(const char *ip)
 
 int main(int argc, char *argv[])
 {
-    char pri[64] = {0};
-    char sec[64] = {0};
-    char dns_file[64] = "1_dns_nameserver.txt";
-    jrd_sys_get_nameserver(pri,sec,dns_file);
-    printf("%s,%s\n",pri,sec);
-
-    char dns_list[4][64] = {0};
+    char ip1[64]="2001:4860:4860::8888";
     int ret = 0;
-    ret = jrd_sys_get_nameserver_list(dns_list,4,dns_file);
-    for(int i=0;i<ret;i++){
-        printf("%s\n",dns_list[i]);
-    }
+    ret = get_ip_type(ip1);
+
+
     return 0;
 }

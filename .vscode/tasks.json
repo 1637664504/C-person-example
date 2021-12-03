@@ -7,9 +7,11 @@
             "args": [
                 "${file}",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}",
+                "${fileDirname}/${fileBasenameNoExtension}.out",
                 "-g",
-                "-ljson-c", "-lpthread"
+                "-ljson-c",
+                "-lpthread",
+                "-lnl-3","-I/usr/include/libnl3",
             ],
             //"command": "make",
             //"args": ["demo2"],
