@@ -7,8 +7,8 @@
 
 typedef struct _ethhdr
 {
-    unsigned char dst_mac[ETH_ALEN];
-    unsigned char src_mac[ETH_ALEN];
+    unsigned char dst_mac[ETH_HEAD_LEN];
+    unsigned char src_mac[ETH_HEAD_LEN];
     unsigned short type;
 }__attribute__((packed)) ethhdr_t;
 
