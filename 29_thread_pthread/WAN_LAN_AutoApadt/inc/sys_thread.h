@@ -16,7 +16,7 @@ struct thread_manage{
     pthread_t thread_pid;
     pthread_mutex_t mutex;
     pthread_cond_t cond;
-    int cmd;
+    int pipefd[2];
     THREAD_STATE state;
 };
 

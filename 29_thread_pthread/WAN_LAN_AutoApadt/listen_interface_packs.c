@@ -44,7 +44,7 @@ int check_dhcp_request(struct raw_packs* packs)
     return ret;
 }
 
-static int listen_interfece_init(const char* ifcname)
+static int listen_interfece_sock_init(const char* ifcname)
 {
     struct ifreq ifr;
     struct sockaddr_ll sll;
@@ -88,12 +88,14 @@ void* lan_listen_dhcp_thread(void *arg)
     int max_fd;
     ssize_t recv_size = 0;
     struct raw_packs packs;
-    struct thread_manage *thread = (struct thread_manage *)arg;
     fd_set fds;
     int check_dhcp_result;
     int ret;
+    struct monitor_link_info *thread_info = (struct monitor_link_info)arg;
+    struct thread_manage *thread = thread_info->lan_manage;
+    char *listen_ifcname = thread_info->ifcname;
 
-    sock_fd = listen_interfece_init("eth2");
+    sock_fd = listen_interfece_sock_init(listen_ifcname);
     if(sock_fd < 0)
     {
         printf("socket socket failed\n");
@@ -159,6 +161,27 @@ void* lan_listen_dhcp_thread(void *arg)
 }
 
 #if 1
+int lan_listen_interface_init(struct monitor_link_info *parent_info)
+{
+    pthread_t tid;
+    int status = -1;
+
+    if(!parent_info || !parent_info->lan_manage)
+        return -1;
+
+    thread_manage_init(parent_info->lan_manage);
+    pthread_create(&tid, NULL, lan_listen_dhcp_thread, parent_info);
+    if(status != 0)
+    {
+        perror("pthread_create error");
+    }
+    pthread_detach(tid);
+
+    return 0;
+}
+#endif
+
+#if 0
 int main(void)
 {
     pthread_t tid;
