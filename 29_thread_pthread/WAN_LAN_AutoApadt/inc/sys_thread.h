@@ -11,6 +11,9 @@ typedef enum{
 }THREAD_STATE;
 
 struct thread_manage{
+    pid_t pid;
+    pid_t ppid;
+    pthread_t thread_pid;
     pthread_mutex_t mutex;
     pthread_cond_t cond;
     int cmd;

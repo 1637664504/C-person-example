@@ -50,3 +50,28 @@ int get_link_ip(char *ifcname, char *ip, unsigned int len)
 
     return ret;
 }
+
+int get_ifcname_mac(char *ifcname, char *mac, unsigned int len)
+{
+    struct ifreq ifreq = {0};
+    int sock;
+    int ret = -1;
+
+    if(!ifcname || !mac || len < HWADDR_LEN)
+        return -1;
+
+    if((sock=socket(AF_INET,SOCK_STREAM,0))<0)
+    {
+            return -2;
+    }
+
+    strncpy(ifreq.ifr_name,ifcname,sizeof(ifreq.ifr_name));
+    if(ioctl(sock,SIOCGIFHWADDR,&ifreq)<0)
+    {
+            return -3;
+    }
+    memcpy(mac,ifreq.ifr_hwaddr.sa_data,HWADDR_LEN);
+
+    return ret;
+}
+
