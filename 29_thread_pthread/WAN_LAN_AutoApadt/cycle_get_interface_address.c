@@ -56,7 +56,7 @@ void* wan_judge_interface(void *arg)
             else
                 wait_time =wait_time_list[wait_count];
             printf("liuj: wait_count=%d, wait_time=%u\n",wait_count,wait_time);
-            thread_manage_wait(thread, wait_time);
+            thread_manage_wait_wakeup(thread, wait_time);
             wait_count ++;
         }
     }

@@ -9,30 +9,27 @@
 #include <sys/ioctl.h>
 #include <linux/if.h>
 #include <string.h>
+#include <pthread.h>
 
 #define BUFLEN 20480
 
 char monitor_list[][16]={
-    "eth0"
+    "eth2"
 };
 
-static pthread_mutex_t g_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t g_cond = PTHREAD_COND_INITIALIZER;
-struct _monitor_thread{
-    pthread_mutex_t mutex;
-    pthread_cond_t cond;
-}
-
-int handler_link_event(const char *ifcname,int flags)
+int monitor_interface_check(const char *ifcname)
 {
-    int i = 0;
+    int ret = -1
     for(i=0; i< sizeof(monitor_list)/sizeof(monitor_list[0]); i++)
     {
-        if(strcmp(ifcname,monitor_list[0]))
-            continue;
-
-        
+        if(strcmp(ifcname,monitor_list[i]) == 0)
+        {
+            ret = 0;
+            break;
+        }
     }
+
+    return ret;
 }
 
 int handler_netlink_msg(const char *buf,int buf_len)
@@ -60,6 +57,7 @@ int handler_netlink_msg(const char *buf,int buf_len)
 			if (attr->rta_type == IFLA_IFNAME)
 			{
 				printf (" %s", (char *) RTA_DATA (attr));
+				monitor_interface_check();
 				break;
 			}
 		}
@@ -97,7 +95,6 @@ int main (int argc, char *argv[])
         FD_ZERO(&fds);
         FD_SET(fd,&fds);
 
-        //ret = select(fd+1, &fds, NULL, NULL, NULL);   //timeout is null ,阻塞到返回
         ret = select(fd+1, &fds, NULL, NULL, &tv);
         if(ret < 0){
             perror("select fail");

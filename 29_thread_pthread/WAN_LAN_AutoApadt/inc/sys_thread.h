@@ -23,7 +23,7 @@ struct thread_manage{
 void thread_manage_stop(struct thread_manage *thread);
 void thread_manage_wakeup(struct thread_manage *thread);
 void thread_manage_suspend(struct thread_manage *thread, unsigned int wait_time);
-void thread_manage_wait(struct thread_manage *thread, unsigned int wait_time);
+void thread_manage_wait_wakeup(struct thread_manage *thread, unsigned int wait_time);
 void thread_manage_release(struct thread_manage *thread);
 int thread_manage_init(struct thread_manage *thread);
 

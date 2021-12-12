@@ -57,7 +57,7 @@ int get_ifcname_mac(char *ifcname, char *mac, unsigned int len)
     int sock;
     int ret = -1;
 
-    if(!ifcname || !mac || len < HWADDR_LEN)
+    if(!ifcname || !mac || len < IFHWADDRLEN)
         return -1;
 
     if((sock=socket(AF_INET,SOCK_STREAM,0))<0)
@@ -70,7 +70,7 @@ int get_ifcname_mac(char *ifcname, char *mac, unsigned int len)
     {
             return -3;
     }
-    memcpy(mac,ifreq.ifr_hwaddr.sa_data,HWADDR_LEN);
+    memcpy(mac,ifreq.ifr_hwaddr.sa_data,IFHWADDRLEN);
 
     return ret;
 }

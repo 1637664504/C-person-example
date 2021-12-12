@@ -9,7 +9,8 @@
 #include <linux/if_packet.h>
 #include <netinet/if_ether.h>
 #include <netinet/in.h>
-#include "common/network/network.h"
+#include "sys_thread.h"
+#include "common/network/sys_network.h"
 #define LISTEN_INTERFACE "eth2"
 
 struct raw_packs{
@@ -22,6 +23,7 @@ int check_dhcp_request(struct raw_packs* packs)
     ethhdr_t *eth_header = NULL;
     iphdr_t *ip_header = NULL;
     ssize_t ip_header_len = 0;
+    int ret = 0;
 
     eth_header = (ethhdr_t *)(packs->data);
     ip_header = (iphdr_t *)(packs->data + ETH_HEAD_LEN);
@@ -35,13 +37,14 @@ int check_dhcp_request(struct raw_packs* packs)
         if (sport == 68 && dport == 67)
         {
             printf("Receive dhcp request.\n");
+            ret = 1;
         }
     }
 
-    return 0;
+    return ret;
 }
 
-int listen_socket_init(void)
+static int listen_interfece_init(const char* ifcname)
 {
     struct ifreq ifr;
     struct sockaddr_ll sll;
@@ -60,7 +63,7 @@ int listen_socket_init(void)
     if (ioctl(sock_fd, SIOCGIFINDEX, &ifr) == -1)
     {
         printf("ioctl failed:%s\n", strerror(errno));
-        ret = -1;
+        return -1;
     }
 
     memset(&sll, 0, sizeof(sll));
@@ -70,16 +73,12 @@ int listen_socket_init(void)
     if (bind(sock_fd, (struct sockaddr *)&sll, sizeof(sll)) < 0)
     {
         printf("bind failed:%s\n", strerror(errno));
-        ret = -1;
+        return -1;
     }
 
     return sock_fd;
 }
 
-int listen_lan_interface_dhcp()
-{
-
-}
 
 void* lan_listen_dhcp_thread(void *arg)
 {
@@ -89,10 +88,12 @@ void* lan_listen_dhcp_thread(void *arg)
     int max_fd;
     ssize_t recv_size = 0;
     struct raw_packs packs;
+    struct thread_manage *thread = (struct thread_manage *)arg;
     fd_set fds;
+    int check_dhcp_result;
     int ret;
 
-    sock_fd = listen_socket_init();
+    sock_fd = listen_interfece_init("eth2");
     if(sock_fd < 0)
     {
         printf("socket socket failed\n");
@@ -102,6 +103,16 @@ void* lan_listen_dhcp_thread(void *arg)
 
     while (1)
     {
+        if(thread->state != thread_running)
+        {
+            printf("task: %s suspend\n",__func__);
+            thread_manage_suspend(thread, 0);
+        }
+        //re-start thread init
+        check_dhcp_result = 0;
+        ret = -1;
+        memset(&tm,0,sizeof(tm));
+
         FD_ZERO(&fds);
         FD_SET(sock_fd, &fds);
         tm.tv_sec = 8;
@@ -117,7 +128,7 @@ void* lan_listen_dhcp_thread(void *arg)
             printf("select timeout\n");
             continue;
         }
-        if(FD_ISSET(sock_fd, &fds))
+        else if(FD_ISSET(sock_fd, &fds))
         {
             memset(recv_buf,0,sizeof(recv_buf));
             recv_size = recv(sock_fd, recv_buf, sizeof(recv_buf)-1, 0);
@@ -130,9 +141,19 @@ void* lan_listen_dhcp_thread(void *arg)
             {
                 packs.data = recv_buf;
                 packs.len = recv_size;
-                check_dhcp_request(&packs);
+                check_dhcp_result = check_dhcp_request(&packs);
             }
         }
+
+        if(check_dhcp_result)
+        {
+            //监听到dhcp request
+            //1.send msg to ubus
+            //2.stop listen interface thread.
+            printf("recv dhcp request ret=%d\n",ret);
+            thread_manage_stop(thread);
+        }
+
     }
 
 }
@@ -141,17 +162,15 @@ void* lan_listen_dhcp_thread(void *arg)
 int main(void)
 {
     pthread_t tid;
-    void **retval;
     struct thread_manage lan_listen_thread_manage;
 
-    thread_manage_init(&lan_listen_dhcp_thread);
+    thread_manage_init(&lan_listen_thread_manage);
     int status = pthread_create(&tid, NULL, lan_listen_dhcp_thread, &lan_listen_thread_manage);
     if(status != 0)
     {
         perror("pthread_create error");
     }
-    pthread_detach(tid);  //1. 不阻塞，线程独立运行
-    //pthread_join(tid,&ret); //2. 阻塞，直到子线程结束， **ret保持线程返回值
+    pthread_detach(tid);
 
     char cmd[16];
     while(1)
