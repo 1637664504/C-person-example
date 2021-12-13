@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
@@ -11,7 +12,12 @@
 #include <netinet/in.h>
 #include "sys_thread.h"
 #include "common/network/sys_network.h"
+#include "monitor_interface_netlink.h"
 #define LISTEN_INTERFACE "eth2"
+
+#ifdef DEBUG
+#define UNIT_TEST 1
+#endif
 
 struct raw_packs{
     char *data;
@@ -20,12 +26,12 @@ struct raw_packs{
 
 int check_dhcp_request(struct raw_packs* packs)
 {
-    ethhdr_t *eth_header = NULL;
+    //ethhdr_t *eth_header = NULL;
     iphdr_t *ip_header = NULL;
     ssize_t ip_header_len = 0;
     int ret = 0;
 
-    eth_header = (ethhdr_t *)(packs->data);
+    //eth_header = (ethhdr_t *)(packs->data);
     ip_header = (iphdr_t *)(packs->data + ETH_HEAD_LEN);
     ip_header_len =  (ip_header->h_verlen & 0x0f) * 4;
 
@@ -59,7 +65,7 @@ static int listen_interfece_sock_init(const char* ifcname)
     }
 
     memset(&ifr, 0, sizeof(ifr));
-    strncpy(ifr.ifr_name, LISTEN_INTERFACE, sizeof(ifr.ifr_name));
+    strncpy(ifr.ifr_name, ifcname, sizeof(ifr.ifr_name));
     if (ioctl(sock_fd, SIOCGIFINDEX, &ifr) == -1)
     {
         printf("ioctl failed:%s\n", strerror(errno));
@@ -79,8 +85,7 @@ static int listen_interfece_sock_init(const char* ifcname)
     return sock_fd;
 }
 
-
-void* lan_listen_dhcp_thread(void *arg)
+void* listen_interface_dhcp_thread(void *arg)
 {
     char recv_buf[2048];
     struct timeval tm;
@@ -91,11 +96,17 @@ void* lan_listen_dhcp_thread(void *arg)
     fd_set fds;
     int check_dhcp_result;
     int ret;
-    struct monitor_link_info *thread_info = (struct monitor_link_info)arg;
-    struct thread_manage *thread = thread_info->lan_manage;
+    #if UNIT_TEST
+    struct thread_manage *thread = (struct thread_manage *)arg;
+    sock_fd = listen_interfece_sock_init("eth2");
+
+    #else
+    struct monitor_thread *thread_info = (struct monitor_thread *)arg;
+    struct thread_manage *thread = &thread_info->lan_manage;
     char *listen_ifcname = thread_info->ifcname;
 
     sock_fd = listen_interfece_sock_init(listen_ifcname);
+    #endif
     if(sock_fd < 0)
     {
         printf("socket socket failed\n");
@@ -109,7 +120,9 @@ void* lan_listen_dhcp_thread(void *arg)
         {
             printf("task: %s suspend\n",__func__);
             thread_manage_suspend(thread, 0);
+            printf("dhcp task: wake up\n");
         }
+        printf("start\n");
         //re-start thread init
         check_dhcp_result = 0;
         ret = -1;
@@ -117,6 +130,7 @@ void* lan_listen_dhcp_thread(void *arg)
 
         FD_ZERO(&fds);
         FD_SET(sock_fd, &fds);
+        FD_SET(thread->pipefd[0], &fds);
         tm.tv_sec = 8;
 
         ret = select(max_fd + 1, &fds, NULL, NULL, &tm);
@@ -127,8 +141,17 @@ void* lan_listen_dhcp_thread(void *arg)
         }
         else if(ret == 0)
         {
-            printf("select timeout\n");
+            printf("listen dhcp select timeout\n");
             continue;
+        }
+
+        if(FD_ISSET(thread->pipefd[0], &fds))
+        {
+            int cmd = 0;
+            read(thread->pipefd[0],&cmd,sizeof(cmd));
+            printf("cmd=%d\n",cmd);
+            if(cmd == thread_stop)
+                continue;
         }
         else if(FD_ISSET(sock_fd, &fds))
         {
@@ -160,17 +183,16 @@ void* lan_listen_dhcp_thread(void *arg)
 
 }
 
-#if 1
-int lan_listen_interface_init(struct monitor_link_info *parent_info)
+int lan_listen_dhcp_thread_manage_create(struct monitor_thread *thread_info)
 {
     pthread_t tid;
     int status = -1;
 
-    if(!parent_info || !parent_info->lan_manage)
+    if(!thread_info)
         return -1;
 
-    thread_manage_init(parent_info->lan_manage);
-    pthread_create(&tid, NULL, lan_listen_dhcp_thread, parent_info);
+    thread_manage_init(&thread_info->lan_manage);
+    status = pthread_create(&tid, NULL, listen_interface_dhcp_thread, thread_info);
     if(status != 0)
     {
         perror("pthread_create error");
@@ -179,16 +201,15 @@ int lan_listen_interface_init(struct monitor_link_info *parent_info)
 
     return 0;
 }
-#endif
 
-#if 0
+#if UNIT_TEST
 int main(void)
 {
     pthread_t tid;
     struct thread_manage lan_listen_thread_manage;
 
     thread_manage_init(&lan_listen_thread_manage);
-    int status = pthread_create(&tid, NULL, lan_listen_dhcp_thread, &lan_listen_thread_manage);
+    int status = pthread_create(&tid, NULL, listen_interface_dhcp_thread, &lan_listen_thread_manage);
     if(status != 0)
     {
         perror("pthread_create error");

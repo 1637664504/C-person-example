@@ -1,14 +1,16 @@
-#ifndef monitor_interface_netlink_h
-#define monitor_interface_netlink_h
+#ifndef _monitor_interface_netlink_h
+#define _monitor_interface_netlink_h
 
+#include "sys_thread.h"
 
-#define LAN_MAX_NUM 4
-struct monitor_thread_info{
+struct monitor_thread{
 	char ifcname[16];
 	int pipefd[2];
 	struct thread_manage lan_manage;
 	struct thread_manage wan_manage;
 };
 
+extern int lan_listen_dhcp_thread_manage_create(struct monitor_thread *thread_info);
+extern int wan_judge_thread_manage_create(struct monitor_thread *thread_info);
 
 #endif

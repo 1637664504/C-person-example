@@ -10,16 +10,15 @@
 #include <linux/if.h>
 #include <string.h>
 #include <pthread.h>
+#include "monitor_interface_netlink.h"
+
 
 #define BUFLEN 2048
 
-char monitor_interface_list[LAN_MAX_NUM][16]={
-    "eth1"
-};
+static char monitor_link[16] = "eth2";
+struct monitor_thread g_monitor_thread;
 
-static struct monitor_thread_info monitor_thread_list[LAN_MAX_NUM];
-
-int monitor_interface_netlink_sock_init()
+int netlink_sock_init()
 {
     int fd;
     int len = BUFLEN;
@@ -39,42 +38,41 @@ int monitor_interface_netlink_sock_init()
     return fd;
 }
 
-int monitor_link_info_init(struct monitor_link_info *info,const char *ifc_name)
+int monitor_thread_init(struct monitor_thread *thread,const char *ifc_name)
 {
     int ret = 0;
 
-    strncpy(info->ifcname,ifc_name,sizeof(info->ifcname)-1);
-    if (pipe(info->pipefd == -1)
+    strncpy(thread->ifcname,ifc_name,sizeof(thread->ifcname)-1);
+    if((ret = pipe(thread->pipefd)) != 0)
     {
         ret = -1;
     }
-    lan_listen_interface_init(info);
-    //to do: wan
+    //lan_listen_dhcp_thread_manage_create(thread);
+    wan_judge_thread_manage_create(thread);
+
     return ret;
 }
 
-void handler_monitor_interface_change(const char *ifc_name, unsigned    ifc_flags)
+void handler_interface_status_change(unsigned ifc_flags)
 {
-    int ret = 0;
-    int i;
     int up = (ifc_flags & IFF_LOWER_UP) ? 1 : 0;
 
-    for(i=0; i<sizeof(monitor_link_list)/sizeof(monitor_link_list[0]); i++)
+    printf("handler link status change \n");
+    struct thread_manage *lan_thread = &g_monitor_thread.lan_manage;
+    struct thread_manage *wan_thread = &g_monitor_thread.wan_manage;
+    if(up)
     {
-        if(strcmp(ifc_name,monitor_link_list[i].ifcname) == 0)
-        {
-            ret = 1;
-            break;
-        }
+        printf("link up 111\n");
+        //thread_manage_wakeup(lan_thread);
+        thread_manage_wakeup(wan_thread);
+        printf("link up 222\n");
     }
-
-    if(ret)
+    else
     {
-        struct thread_manage *lan_thread = &monitor_link_list[i].lan_manage;
-        if(up)
-            thread_manage_wakeup(lan_thread);
-        else
-            thread_manage_stop(lan_thread);
+        printf("link down 111\n");
+        //thread_manage_stop(lan_thread);
+        thread_manage_stop(wan_thread);
+        printf("link down 222\n");
     }
 
     return ;
@@ -88,7 +86,6 @@ int handler_netlink_msg(const char *buf,int buf_len)
     char ifcname[16]="";
     int nl_len = buf_len;
     int len;
-    int ret = -1;
 
     for (nh = (struct nlmsghdr *) buf; NLMSG_OK (nh, nl_len); nh = NLMSG_NEXT (nh, nl_len))
     {
@@ -109,13 +106,16 @@ int handler_netlink_msg(const char *buf,int buf_len)
                 //printf (" %s", (char *) RTA_DATA (attr));
                 strncpy(ifcname,(char *)RTA_DATA (attr),sizeof(ifcname)-1);
                 printf (" %s", ifcname);
-                ret = monitor_interface_check(ifcname);
-                //1.显示msg down/up通知
+                if(strcmp(ifcname, g_monitor_thread.ifcname) == 0)
+                    handler_interface_status_change(ifinfo->ifi_flags);
+
                 break;
             }
         }
         printf(" -----\n");
     }
+
+    return 0;
 }
 
 #if 0
@@ -126,7 +126,9 @@ int main (int argc, char *argv[])
 {
     int fd;
     char buf[BUFLEN] = { 0 };
-    fd = monitor_interface_netlink_sock_init();
+
+    fd = netlink_sock_init();
+    monitor_thread_init(&g_monitor_thread,monitor_link);
 
     while (1)
     {
@@ -147,9 +149,10 @@ int main (int argc, char *argv[])
         }
         else if(ret == 0)
         {
-            printf("select timeout\n");
+            printf("netlink select timeout\n");
             continue;
         }
+
         if(FD_ISSET(fd, &fds) && ((ret = read(fd, buf, BUFLEN)) > 0))
         {
             handler_netlink_msg(buf,ret);

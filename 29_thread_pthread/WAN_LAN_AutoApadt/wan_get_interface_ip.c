@@ -4,18 +4,30 @@
 #include <time.h>
 #include "sys_thread.h"
 #include "common/network/sys_network.h"
+#include "monitor_interface_netlink.h"
 
-#define WAN_IFCNAME "eth1"
+#ifdef DEBUG
+#define UNIT_TEST 1
+#endif
+
+#define WAN_IFCNAME "eth2"
 #define MAX_WAIT_TIME 8
+
 void* wan_judge_interface(void *arg)
 {
     char ip[16];
+#if UNIT_TEST
     struct thread_manage *thread = (struct thread_manage *)arg;
-    unsigned int wait_time_list[] = {4,4,8,MAX_WAIT_TIME};
+    char *ifc_name = WAN_IFCNAME;
+#else
+    struct monitor_thread *thread_info = (struct monitor_thread *)arg;
+    struct thread_manage *thread = &thread_info->wan_manage;
+    char *ifc_name = thread_info->ifcname;
+#endif
+    unsigned int wait_time_list[] = {4,4,6,MAX_WAIT_TIME};
     unsigned int wait_time;
     int wait_count = 0;
     int ret;
-    char *ifcname = WAN_IFCNAME;
 
     while(1)
     {
@@ -31,7 +43,7 @@ void* wan_judge_interface(void *arg)
         ret = 0;
         memset(ip,0,sizeof(ip));
 
-        if(get_link_ip(ifcname,ip,sizeof(ip)-1) == 0)
+        if(get_link_ip(ifc_name,ip,sizeof(ip)-1) == 0)
         {
             //1.set mem
             //2.ubus notify
@@ -39,7 +51,8 @@ void* wan_judge_interface(void *arg)
             printf("get ip=%s\n",ip);
             ret = 1;
         }
-        else{
+        else
+        {
             //sleep
             printf("not find ip\n");
         }
@@ -55,7 +68,7 @@ void* wan_judge_interface(void *arg)
                 wait_time = MAX_WAIT_TIME;
             else
                 wait_time =wait_time_list[wait_count];
-            printf("liuj: wait_count=%d, wait_time=%u\n",wait_count,wait_time);
+            printf("wait_count=%d, wait_time=%u\n",wait_count,wait_time);
             thread_manage_wait_wakeup(thread, wait_time);
             wait_count ++;
         }
@@ -64,7 +77,26 @@ void* wan_judge_interface(void *arg)
     return NULL;
 }
 
-#if 1
+int wan_judge_thread_manage_create(struct monitor_thread *thread_info)
+{
+    pthread_t tid;
+    int status = -1;
+
+    if(!thread_info)
+        return -1;
+
+    thread_manage_init(&thread_info->wan_manage);
+    status = pthread_create(&tid, NULL, wan_judge_interface, thread_info);
+    if(status != 0)
+    {
+        perror("pthread_create error");
+    }
+    pthread_detach(tid);
+
+    return 0;
+}
+
+#if UNIT_TEST
 int main(void)
 {
     pthread_t tid;
