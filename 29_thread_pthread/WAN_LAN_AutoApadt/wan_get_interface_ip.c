@@ -11,7 +11,7 @@
 #endif
 
 #define WAN_IFCNAME "eth2"
-#define MAX_WAIT_TIME 8
+#define MAX_WAIT_TIME 4
 
 void* wan_judge_interface(void *arg)
 {
@@ -24,7 +24,7 @@ void* wan_judge_interface(void *arg)
     struct thread_manage *thread = &thread_info->wan_manage;
     char *ifc_name = thread_info->ifcname;
 #endif
-    unsigned int wait_time_list[] = {4,4,6,MAX_WAIT_TIME};
+    unsigned int wait_time_list[] = {4,4,4,MAX_WAIT_TIME};
     unsigned int wait_time;
     int wait_count = 0;
     int ret;
@@ -53,7 +53,6 @@ void* wan_judge_interface(void *arg)
         }
         else
         {
-            //sleep
             printf("not find ip\n");
         }
 
@@ -65,9 +64,15 @@ void* wan_judge_interface(void *arg)
         else
         {
             if(wait_count > (sizeof(wait_time_list)/wait_time_list[0]-1))
-                wait_time = MAX_WAIT_TIME;
+            {
+                printf("Not get wan_ip. Set to LAN\n");
+                thread_manage_stop(thread);
+            }
             else
+            {
                 wait_time =wait_time_list[wait_count];
+            }
+
             printf("wait_count=%d, wait_time=%u\n",wait_count,wait_time);
             thread_manage_wait_wakeup(thread, wait_time);
             wait_count ++;
@@ -119,7 +124,7 @@ int main(void)
         scanf("%s",cmd);
         if(cmd[0] == 'r')
         {
-            thread_manage_wakeup(&wan_judge_thread);\
+            thread_manage_wakeup(&wan_judge_thread);
         }
         else if(cmd[0] == 's')
         {

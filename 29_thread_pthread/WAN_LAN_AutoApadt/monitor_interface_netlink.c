@@ -58,7 +58,7 @@ void handler_interface_status_change(unsigned ifc_flags)
     int up = (ifc_flags & IFF_LOWER_UP) ? 1 : 0;
 
     printf("handler link status change \n");
-    struct thread_manage *lan_thread = &g_monitor_thread.lan_manage;
+    //struct thread_manage *lan_thread = &g_monitor_thread.lan_manage;
     struct thread_manage *wan_thread = &g_monitor_thread.wan_manage;
     if(up)
     {
