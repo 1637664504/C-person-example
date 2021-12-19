@@ -56,7 +56,7 @@ struct topic* topic_add(struct topic_manage *manage,const char* name)
     return item;
 }
 
-struct topic* topic_del_one(struct topic_manage *manage,const char* name)
+int topic_del(struct topic_manage *manage,const char* name)
 {
     struct topic *item = NULL;
 
@@ -76,6 +76,26 @@ struct topic* topic_del_one(struct topic_manage *manage,const char* name)
 
     return item;
 }
+
+struct topic* topic_search(struct topic_manage *manage,const char* name)
+{
+    struct topic *item = NULL;
+
+    if(!name || name[0]=='\0')
+        return NULL;
+
+    list_for_each_entry(item,&manage->list,list){
+        if(strncmp(item->topic_name,name,strlen(item->topic_name)))
+            continue;
+        else
+        {
+            break;
+        }
+    }
+
+    return item;
+}
+
 
 void topic_for_each_list_show(struct topic_manage *manage)
 {
