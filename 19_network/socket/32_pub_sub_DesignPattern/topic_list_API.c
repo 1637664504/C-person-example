@@ -4,10 +4,6 @@
 #include <assert.h>
 #include "topic.h"
 
-struct topic_manage{
-    struct list_head list;
-};
-
 int topic_manage_init(struct topic_manage *manage)
 {
     int ret = -1;
@@ -54,6 +50,43 @@ struct topic* topic_add(struct topic_manage *manage,const char* name)
     }
 
     return item;
+}
+
+int topic_add_fd(struct topic* item, int fd)
+{
+    int i;
+    for(i=0;i<TOPIC_MAX_SUB_CLIENT;i++)
+    {
+        if(item->sub_fd[i] == 0)
+        {
+            item->sub_fd[i] = fd;
+            item->sub_count ++;
+        }
+    }
+}
+
+int topic_del_fd(struct topic_manage *manage, int fd)
+{
+    struct topic *item = NULL;
+    int i;
+    
+
+    if(!manage && !fd)
+        return ;
+
+    list_for_each_entry(item,&manage->list,list){
+        for(i=0; i<TOPIC_MAX_SUB_CLIENT; i++)
+        {
+            if(item->sub_fd[i] == fd)
+            {
+                item->sub_fd[i] == 0;
+                item->sub_count --;
+                return 0;
+            }
+        }
+    }
+
+    return -1;
 }
 
 int topic_del(struct topic_manage *manage,const char* name)
@@ -106,6 +139,7 @@ void topic_for_each_list_show(struct topic_manage *manage)
     }
 }
 
+#if TEST
 int main(int argc, char *argv[])
 {
     struct topic_manage manage;
@@ -124,4 +158,4 @@ int main(int argc, char *argv[])
     topic_for_each_list_show(&manage);
 
     return 0;
-}
+}#endif

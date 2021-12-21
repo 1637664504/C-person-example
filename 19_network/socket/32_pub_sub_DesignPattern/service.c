@@ -5,8 +5,11 @@
 #include<sys/types.h>
 #include<sys/socket.h>
 #include<netinet/in.h>
+#include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "topic.h"
+#include "pub_sub.h"
 
 #define MAXLINE 1024
 struct topic_manage manage;
@@ -20,67 +23,68 @@ int fd_set_nonblock(int fd)
     return ret;
 }
 
-struct publish_msg{
-    char topic_name[32];
-    int len;
-    void *msg;
-};
-
-struct subscribe_msg{
-    char topic_name[32];
-};
-
-struct topic_msg{
-    int topic_opt;
-#if 1
-    void *pub_sub_msg;
-#else
-    enum {
-        struct publish_msg pub_msg;
-        struct subscribe_msg sub_msg; 
-    }pub_sub_msg;
-#endif
-};
-
-
-void broadcast_publish_msg(struct topic *item,struct publish_msg *pub_msg)
+void broadcast_publish_msg(struct topic *item,struct pub_msg *pub_msg)
 {
     int i=0;
-    int count=0;
-    for(i=0;i<ONE_TOPIC_MAX_SUBSCRIBE && count < item->sub_count;i++){
-
+    for(i=0; i<TOPIC_MAX_SUB_CLIENT; i++){
+        if(item->sub_fd[i])
+            write(item->sub_fd[i],pub_msg->info,pub_msg->len);
     }
 }
 
-
-handler_connect(int sock)
+void handler_connect(int sock)
 {
-    char buf[1024]="";
-    struct topic_msg msg;
-    int len = 0;
-    struct topic *topic_item;
+    char buf[2048]="";
+    unsigned int len = 0;
+    struct topic *item;
+    unsigned char code = 0;
 
-    msg.msg = buf;
-    len = recv(connfd, &msg, MAXLINE, 0);
-    if(msg.topic_opt == TOPIC_PUB)
+    len = recv(sock, &buf, sizeof(buf), 0);
+    if(len < 0)
     {
-        struct publish_msg *pub_msg = (struct publish_msg *)pub_sub_msg;
-        if(topic_item = topic_search(&manage, pub_msg.topic_name))
+        printf("recv failed\n");
+        return ;
+    }
+    else if(len == 0)
+    {
+        printf("close this client sock");
+        topic_del_fd(&manage,sock);
+        return ;
+    }
+    
+    code = (unsigned char)buf[0];
+    if(code == TOPIC_PUB)
+    {
+        struct pub_msg *msg = (struct pub_msg *)buf;
+        printf("pub %s - msg=%s\n",msg->topic_name,msg->info);
+        if((item = topic_search(&manage,msg->topic_name)) != NULL)
         {
-            broadcast_topic_msg(topic_name,pub_msg);
+            broadcast_publish_msg(item,msg);
+        }
+    }
+    else if(code == TOPIC_SUB)
+    {
+        struct sub_msg *msg = (struct sub_msg *)buf;
+        printf("sub %s\n",msg->topic_name);
+        if((item = topic_search(&manage,msg->topic_name)) != NULL)
+        {
+            //has exist
+            topic_add_fd(item,sock);
+        }
+        else
+        {
+            if((item = topic_add(&manage,msg->topic_name)) != NULL)
+                topic_add_fd(item,sock);
         }
     }
 
-    
-
 }
+
 int main(int argc, char** argv)
 {
     int listenfd;
     int connfd = 0;
-    struct sockaddr_in     servaddr;
-    char    buff[4096];
-    int     len;
+    struct sockaddr_in servaddr;
     fd_set rd_set;
     struct timeval tm;
     int max_fd = 0;
@@ -92,8 +96,12 @@ int main(int argc, char** argv)
 
     memset(&servaddr, 0, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     servaddr.sin_port = htons(6666);
+    //servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    if(inet_pton(AF_INET, "127.0.0.1", &servaddr.sin_addr) <= 0){
+        printf("inet_pton error for \n");
+        exit(0);
+    }
 
     if( bind(listenfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) == -1){
         printf("bind socket error: %s(errno: %d)\n",strerror(errno),errno);
@@ -120,8 +128,6 @@ int main(int argc, char** argv)
             if(max_fd <= connfd)
                 max_fd = connfd+1;
         }
-        if(max_fd <= listenfd)
-            max_fd = listenfd+1;
 
         memset(&tm,0,sizeof(tm));
         tm.tv_sec = 4;
@@ -145,13 +151,20 @@ int main(int argc, char** argv)
                 continue;
             }
             fd_set_nonblock(connfd);
+            printf("new connect\n");
         }
+
         else if(FD_ISSET(connfd,&rd_set))
         {
+            handler_connect(connfd);
+        #if 0
             len = recv(connfd, buff, MAXLINE, 0);
             //len = read(connfd,buff,MAXLINE);
             if(len > 0)
+            {
                 printf("recv msg from client: %s\n", buff);
+                handler_connect()
+            }
             else if(len == 0)
             {
                 printf("recv len=%d, error=%d::%s\n", len,errno,strerror(errno));
@@ -164,6 +177,7 @@ int main(int argc, char** argv)
                 printf("recv failed len=%d, error=%d::%s\n", len,errno,strerror(errno));
                 sleep(1);
             }
+        #endif
         }
 
     }
