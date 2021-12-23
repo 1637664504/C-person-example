@@ -32,12 +32,13 @@ void broadcast_publish_msg(struct topic *item,struct pub_msg *pub_msg)
     }
 }
 
-void handler_connect(int sock)
+void handler_connect(int *sock_fd)
 {
     char buf[2048]="";
     unsigned int len = 0;
     struct topic *item;
     unsigned char code = 0;
+    int sock = *sock_fd;
 
     len = recv(sock, &buf, sizeof(buf), 0);
     if(len < 0)
@@ -49,6 +50,8 @@ void handler_connect(int sock)
     {
         printf("close this client sock");
         topic_del_fd(&manage,sock);
+        close(*sock_fd);
+        *sock_fd = 0;
         return ;
     }
     
@@ -56,11 +59,13 @@ void handler_connect(int sock)
     if(code == TOPIC_PUB)
     {
         struct pub_msg *msg = (struct pub_msg *)buf;
-        printf("pub %s - msg=%s\n",msg->topic_name,msg->info);
+        printf("pub %s - msg=%s\n",msg->topic_name,(char *)&msg->info);
         if((item = topic_search(&manage,msg->topic_name)) != NULL)
         {
             broadcast_publish_msg(item,msg);
         }
+        close(*sock_fd);
+        *sock_fd = 0;
     }
     else if(code == TOPIC_SUB)
     {
@@ -122,6 +127,8 @@ int main(int argc, char** argv)
 
         FD_ZERO(&rd_set);
         FD_SET(listenfd, &rd_set);
+
+        max_fd = listenfd+1;
         if(connfd)
         {
             FD_SET(connfd, &rd_set);
@@ -130,9 +137,9 @@ int main(int argc, char** argv)
         }
 
         memset(&tm,0,sizeof(tm));
-        tm.tv_sec = 4;
+        tm.tv_sec = 32;
 
-        ret = select(max_fd,&rd_set,NULL,NULL,&tm);
+        ret = select(max_fd,&rd_set,NULL,NULL,NULL);
         if(ret < 0)
         {
             perror("select fail\n");
@@ -156,7 +163,7 @@ int main(int argc, char** argv)
 
         else if(FD_ISSET(connfd,&rd_set))
         {
-            handler_connect(connfd);
+            handler_connect(&connfd);
         #if 0
             len = recv(connfd, buff, MAXLINE, 0);
             //len = read(connfd,buff,MAXLINE);

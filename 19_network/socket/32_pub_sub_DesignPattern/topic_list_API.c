@@ -54,15 +54,20 @@ struct topic* topic_add(struct topic_manage *manage,const char* name)
 
 int topic_add_fd(struct topic* item, int fd)
 {
+    int ret = -1;
     int i;
+    
     for(i=0;i<TOPIC_MAX_SUB_CLIENT;i++)
     {
         if(item->sub_fd[i] == 0)
         {
             item->sub_fd[i] = fd;
             item->sub_count ++;
+            ret = 0;
         }
     }
+
+    return ret;
 }
 
 int topic_del_fd(struct topic_manage *manage, int fd)
@@ -72,14 +77,14 @@ int topic_del_fd(struct topic_manage *manage, int fd)
     
 
     if(!manage && !fd)
-        return ;
+        return -1;
 
     list_for_each_entry(item,&manage->list,list){
         for(i=0; i<TOPIC_MAX_SUB_CLIENT; i++)
         {
             if(item->sub_fd[i] == fd)
             {
-                item->sub_fd[i] == 0;
+                item->sub_fd[i] = 0;
                 item->sub_count --;
                 return 0;
             }
@@ -94,7 +99,7 @@ int topic_del(struct topic_manage *manage,const char* name)
     struct topic *item = NULL;
 
     if(!name || name[0]=='\0')
-        return NULL;
+        return -1;
 
     list_for_each_entry(item,&manage->list,list){
         if(strncmp(item->topic_name,name,strlen(item->topic_name)))
@@ -107,7 +112,7 @@ int topic_del(struct topic_manage *manage,const char* name)
         }
     }
 
-    return item;
+    return 0;
 }
 
 struct topic* topic_search(struct topic_manage *manage,const char* name)

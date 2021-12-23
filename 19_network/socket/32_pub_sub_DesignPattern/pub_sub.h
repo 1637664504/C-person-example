@@ -23,7 +23,7 @@ struct pub_msg{
     unsigned char code;
     char topic_name[32];
     unsigned int len;
-    char *info;
+    void *info;
 };
 
 #endif
