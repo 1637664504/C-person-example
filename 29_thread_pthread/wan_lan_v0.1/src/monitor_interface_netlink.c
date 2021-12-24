@@ -10,11 +10,12 @@
 #include <linux/if.h>
 #include <string.h>
 #include <pthread.h>
+#include "jrd_wan_lan.h"
 #include "monitor_interface_netlink.h"
 
 #define BUFLEN 2048
 
-static char monitor_link[16] = "eth2";
+static char monitor_link[16] = "eth1";
 struct monitor_thread g_monitor_thread;
 
 int netlink_sock_init()
@@ -41,7 +42,7 @@ void send_cmd_to_main_thread(struct monitor_thread *thread,int cmd)
 {
     struct cmd_msg msg;
     memset(&msg,0,sizeof(msg));
-    msg.tid = gettid();
+    msg.tid = pthread_self();
     msg.cmd = cmd;
 
     write(thread->cmd_fd[1],&msg,sizeof(msg));
@@ -65,23 +66,32 @@ int monitor_thread_init(struct monitor_thread *thread,const char *ifc_name)
 void handler_interface_status_change(unsigned ifc_flags)
 {
     int up = (ifc_flags & IFF_LOWER_UP) ? 1 : 0;
+    static int last_state = -1;
 
-    printf("handler link status change \n");
+    if(ifc_flags)
+    {
+        if(last_state == up)
+            return;
+        else
+            last_state = up;
+    }
+
+    printf("handler link status change up=%d,ifc_flags=%x\n",up,ifc_flags);
     struct thread_manage *lan_thread = &g_monitor_thread.lan_manage;
     struct thread_manage *wan_thread = &g_monitor_thread.wan_manage;
     if(up)
     {
-        printf("link up 111\n");
+        printf("link up \n");
         thread_manage_wakeup(lan_thread);
         thread_manage_wakeup(wan_thread);
-        printf("link up 222\n");
     }
     else
     {
-        printf("link down 111\n");
+        printf("link down \n");
         thread_manage_stop(lan_thread);
         thread_manage_stop(wan_thread);
-        printf("link down 222\n");
+        if(ifc_flags)   //0 is cmd brctl or manual set down. Not handler
+            jrd_adaption_set_down(g_monitor_thread.ifcname);
     }
 
     return ;
@@ -132,41 +142,35 @@ void handler_cmd_msg(int cmd_fd)
     char buf[1024] = "";
     int len = 0;
     struct cmd_msg *msg;
+
     len = read(cmd_fd,buf,sizeof(buf)-1);
     if(len > 0)
     {
         msg = (struct cmd_msg *)buf;
         if(msg->cmd == CMD_LAN_FINISH)
         {
-            printf("juge to LAN\n");
-            //mem update
-            //notify
             handler_interface_status_change(0);
+            jrd_adaption_set_lan(monitor_link);
+            printf("juge to LAN\n");
         }
         else if(msg->cmd == CMD_WAN_FINISH)
         {
-            printf("juge to WAN\n");
-            //mem update
-            //notify
             handler_interface_status_change(0);
+            jrd_adaption_set_wan(monitor_link);
+            printf("juge to WAN\n");
         }
     }
 }
 
-
-
-#if 0
-int monitor_interface_netlink()
-#else
 int main (int argc, char *argv[])
-#endif
 {
-    char buf[BUFLEN] = { 0 };
+    char buf[BUFLEN] = {0};
     int fd;
     int max_fd;
 
     fd = netlink_sock_init();
     monitor_thread_init(&g_monitor_thread,monitor_link);
+    pthread_mutex_init(&g_monitor_thread.mutex, NULL);
 
     while (1)
     {
@@ -175,7 +179,7 @@ int main (int argc, char *argv[])
         int ret;
         int cmd_fd = g_monitor_thread.cmd_fd[0];
 
-        tv.tv_sec=5;
+        tv.tv_sec=8;
         tv.tv_usec=0;
         FD_ZERO(&fds);
         FD_SET(fd,&fds);

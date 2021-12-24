@@ -13,7 +13,9 @@
 #include "sys_thread.h"
 #include "common/network/sys_network.h"
 #include "monitor_interface_netlink.h"
-#define LISTEN_INTERFACE "eth2"
+
+#define LISTEN_INTERFACE "eth1"
+static char listen_interface[16];
 
 #ifdef DEBUG
 #define UNIT_TEST 1
@@ -33,7 +35,7 @@ int check_dhcp_request(struct raw_packs* packs)
     int ret = 0;
 
     eth_header = (ethhdr_t *)(packs->data);
-    get_link_mac(LISTEN_INTERFACE,link_mac,IFHWADDRLEN);
+    get_link_mac(listen_interface,link_mac,IFHWADDRLEN);
     if(memcmp(eth_header->src_mac,link_mac,IFHWADDRLEN) == 0)
         return 0;
 
@@ -61,7 +63,7 @@ static int listen_interfece_sock_init(const char* ifcname)
     struct sockaddr_ll sll;
     int sock_fd;
 
-    /* capture ip datagram without ethernet header */    
+    /* capture ip datagram without ethernet header */
     sock_fd = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_IP));
     if (sock_fd < 0)
     {
@@ -108,9 +110,9 @@ void* listen_interface_dhcp_thread(void *arg)
     #else
     struct monitor_thread *thread_info = (struct monitor_thread *)arg;
     struct thread_manage *thread = &thread_info->lan_manage;
-    char *listen_ifcname = thread_info->ifcname;
+    strncpy(listen_interface,thread_info->ifcname,sizeof(listen_interface)-1);
 
-    sock_fd = listen_interfece_sock_init(listen_ifcname);
+    sock_fd = listen_interfece_sock_init(listen_interface);
     #endif
     if(sock_fd < 0)
     {
@@ -121,14 +123,12 @@ void* listen_interface_dhcp_thread(void *arg)
 
     while (1)
     {
-        printf("LAN st=%d\n",thread->state);
         if(thread->state != thread_running)
         {
             printf("LAN task: %s suspend\n",__func__);
             thread_manage_suspend(thread, 0);
             printf("LAN dhcp task: wake up\n");
         }
-        printf("LAN start\n");
         //re-start thread init
         check_dhcp_result = 0;
         ret = -1;
@@ -170,9 +170,6 @@ void* listen_interface_dhcp_thread(void *arg)
 
         if(check_dhcp_result)
         {
-            //监听到dhcp request
-            //1.send msg to ubus
-            //2.stop listen interface thread.
             printf("LAN recv dhcp request ret=%d\n",ret);
             thread_manage_stop(thread);
             send_cmd_to_main_thread(thread_info,CMD_LAN_FINISH);

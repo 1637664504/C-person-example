@@ -39,7 +39,7 @@ void show_hex(unsigned char* src, unsigned int len)
 int main(int argc, char *argv[])
 {
     char mac[MAC_LEN]="";
-    get_ifcname_mac("eth1",mac,sizeof(mac));
+    get_link_mac("eth1",mac,sizeof(mac));
     show_hex(mac,sizeof(mac));
     printf("%02x:%02x:%02x:%02x:%02x:%02x\n",
                         (unsigned char)mac[0],

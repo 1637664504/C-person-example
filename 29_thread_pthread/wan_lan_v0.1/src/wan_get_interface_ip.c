@@ -10,7 +10,7 @@
 #define UNIT_TEST 1
 #endif
 
-#define WAN_IFCNAME "eth2"
+#define WAN_IFCNAME "eth1"
 #define MAX_WAIT_TIME 4
 
 void* wan_judge_interface(void *arg)
@@ -25,7 +25,7 @@ void* wan_judge_interface(void *arg)
     char *ifc_name = thread_info->ifcname;
 #endif
     unsigned int wait_time_list[] = {4,4,4,MAX_WAIT_TIME};
-    unsigned int wait_time;
+    unsigned int wait_time = 4;
     int wait_count = 0;
     int ret;
 
@@ -55,7 +55,7 @@ void* wan_judge_interface(void *arg)
         {
             wait_count = 0;
             thread_manage_stop(thread);
-            send_cmd_to_main_thread(thread_info,CMD_LAN_FINISH);
+            send_cmd_to_main_thread(thread_info,CMD_WAN_FINISH);
         }
         else
         {
@@ -111,8 +111,8 @@ int main(void)
     {
         perror("pthread_create error");
     }
-    pthread_detach(tid);  //1. 不阻塞，线程独立运行
-    //pthread_join(tid,&ret); //2. 阻塞，直到子线程结束， **ret保持线程返回值
+    pthread_detach(tid);
+    //pthread_join(tid,&ret);
 
     char cmd[16];
     while(1)

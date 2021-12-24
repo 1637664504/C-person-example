@@ -14,23 +14,23 @@ typedef struct _ethhdr
 }__attribute__((packed)) ethhdr_t;
 
 typedef struct _iphdr
-{     
+{
     unsigned char h_verlen;
     unsigned char tos;
     unsigned short total_len;
-    unsigned short ident; 
+    unsigned short ident;
     unsigned short frag_and_flags;
     unsigned char ttl;
-    unsigned char protocol; 
-    unsigned short checksum; 
-    unsigned int src_ip;   
-    unsigned int dst_ip; 
-}__attribute__((packed)) iphdr_t;  
+    unsigned char protocol;
+    unsigned short checksum;
+    unsigned int src_ip;
+    unsigned int dst_ip;
+}__attribute__((packed)) iphdr_t;
 
-typedef struct _udphdr 
+typedef struct _udphdr
 {
-    unsigned short sport; 
+    unsigned short sport;
     unsigned short dport;
-    unsigned short len;  
+    unsigned short len;
     unsigned short sum;
 }__attribute__((packed)) udphdr_t;

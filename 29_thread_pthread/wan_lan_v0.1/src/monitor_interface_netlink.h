@@ -10,13 +10,14 @@
 #define CMD_WAN_FINISH   3
 
 struct cmd_msg{
-    pid_t tid;
+    pthread_t tid;
     int cmd;
 };
 
 struct monitor_thread{
 	char ifcname[16];
 	int cmd_fd[2];
+	pthread_mutex_t mutex;
 	struct thread_manage lan_manage;
 	struct thread_manage wan_manage;
 };
