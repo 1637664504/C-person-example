@@ -51,7 +51,10 @@ void listen_event_main(int sock)
         if (n <= 0)
         {
             if (errno == EINTR)
+            {
+                printf("client disconnect\n");
                 continue;
+            }
             exit(-1);
         }
         msg = (struct jrd_event_msg *)recvbuf;
