@@ -15,8 +15,8 @@ int main(void)
     array->show(array);
 
     array->del(array,9);
-    array->del(array,3);
-    array->del(array,1);
+    //array->del(array,3);
+    //array->del(array,1);
     array->show(array);
     
     sortArray_release(array);
