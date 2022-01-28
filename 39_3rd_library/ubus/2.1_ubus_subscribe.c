@@ -13,9 +13,9 @@ static int test_notify(struct ubus_context *ctx, struct ubus_object *obj,
 			      struct ubus_request_data *req,
 			      const char *method, struct blob_attr *msg)
 {
-	printf("notify handler...\n");
+	printf("notify handler... counter=%d\n",counter);
 	counter++;
-	if (counter > 3)
+	if (counter > 10)
 		ubus_unsubscribe(ctx, &test_event, obj_id); /* 取消订阅 */
 	return 0;
 }
@@ -25,7 +25,7 @@ static void test_handle_remove(struct ubus_context *ctx,
 {
 	printf("remove handler...\n");
 }
- 
+
 static void subscriber_main(void)
 {
 	int ret;

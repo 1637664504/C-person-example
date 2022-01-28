@@ -9,18 +9,17 @@ int main ()
     json_object *pobj_poarams = NULL;
     json_object *pobj_link = NULL;
     json_object *pobj_status = NULL;
+    json_object *pobj_aaa = NULL;
 
-#if test
     pobj = json_tokener_parse(buf);
-    pobj_poarams = json_object_object_get(pobj,"params");
-    pobj_link = json_object_object_get(pobj_poarams,"link");
-    pobj_status = json_object_object_get(pobj_poarams,"status");
-#else
-    pobj = json_tokener_parse(buf);
-    //pobj_poarams = json_object_object_get(pobj,"params");
-    pobj_link = json_object_object_get(pobj,"link");
-    pobj_status = json_object_object_get(pobj,"status");
-#endif    
+    if(json_object_object_get_ex(pobj,"params",&pobj_poarams))
+    {
+        int ret1,ret2,ret3;
+        ret1= json_object_object_get_ex(pobj_poarams,"link",&pobj_link);
+        ret2 = json_object_object_get_ex(pobj_poarams,"status",&pobj_status);
+        ret3 = json_object_object_get_ex(pobj_poarams,"aaa",&pobj_aaa);
+        printf("%d %d %d\n",ret1,ret2,ret3);
+    }
 
     printf("%s %d\n",json_object_get_string(pobj_link),json_object_get_int(pobj_status));
 

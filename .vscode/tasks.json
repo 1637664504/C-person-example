@@ -4,17 +4,21 @@
             "type": "cppbuild",
             "label": "C/C++: gcc build active file",
             "command": "/usr/bin/gcc",
+            ///*
             "args": [
                 "${file}",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}.out",
-                "-g",
+                "-g","-Wall"
                 "-ljson-c",
                 "-lpthread",
                 "-lnl-3","-I/usr/include/libnl3",
             ],
-            //"command": "make",
-            //"args": ["demo2"],
+            //*/
+            /*
+            "command": "make",
+            "args": ["all"],
+            */
             "options": {
                 "cwd": "${fileDirname}"
             },

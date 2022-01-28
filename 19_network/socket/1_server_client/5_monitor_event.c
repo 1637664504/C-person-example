@@ -4,13 +4,15 @@
 #include<errno.h>
 #include<sys/types.h>
 #include<sys/socket.h>
-#include<netinet/in.h>
+#include <sys/un.h>
+#include <netinet/in.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <arpa/inet.h>
 
 #include "lib/array/sortArray.h"
 #include "lib/common_sys.h"
+#include "event_monitor.h"
 #define MAXLINE 1024
 
 int get_trigger_fd(int fd[],int count,fd_set *set)
@@ -39,48 +41,54 @@ int client_fds_set(struct sortArray *clnt,fd_set *set)
     return i;
 }
 
+const char unix_socket_name[32] = "test_unix_sock";
+
+int unix_socket_server_init(const char *path, struct sockaddr_un *server, const unsigned int client_num)
+{
+    int sock;
+    int server_len;
+
+    if(!path || !server || !client_num)
+        return -1;
+
+    sock = socket(AF_UNIX, SOCK_STREAM, 0);
+    if(sock <= 0)
+        return -1;
+
+    unlink(path);
+    memset(server,0,sizeof(*server));
+    server->sun_family = AF_UNIX;
+    strcpy(server->sun_path, path);
+    server_len = sizeof(struct sockaddr_un);
+
+    if(bind(sock, (struct sockaddr *)server, server_len) == -1)
+    {
+        printf("bind error: %d-%s",errno,strerror(errno));
+        exit(-1);
+    }
+        
+    if(listen(sock, client_num) == -1)
+    {
+        printf("listen error: %d-%s",errno,strerror(errno));
+        exit(-1);
+    }
+
+    return sock;
+}
+
 int main(int argc, char** argv)
 {
+    char buff[1024];
+    struct sockaddr_un servaddr;
     int listenfd;
     int connfd = 0;
-    struct sockaddr_in     servaddr;
-    char    buff[4096];
-    int     len;
+    int len;
+
+    int max_fd = 0;
     fd_set rd_set;
     struct timeval tm;
-    int max_fd = 0;
-    unsigned short port = 9911;
-    char ip[16] = "127.0.0.1";
 
-    if( argc == 3){
-        printf("usage: ./client ip port\n");
-        port = (unsigned short)atoi(argv[2]);
-        strncpy(ip,argv[1],sizeof(ip)-1);
-        //exit(0);
-    }
-
-    if((listenfd = socket(AF_INET, SOCK_STREAM, 0)) == -1 ){
-        printf("create socket error: %s(errno: %d)\n",strerror(errno),errno);
-        exit(0);
-    }
-
-    memset(&servaddr, 0, sizeof(servaddr));
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_port = htons(port);
-    //servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    if(inet_pton(AF_INET, ip, &servaddr.sin_addr) <= 0){
-        printf("inet_pton error for %s\n",argv[1]);
-        exit(0);
-    }
-
-    if(bind(listenfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) == -1){
-        printf("bind socket error: %s(errno: %d)\n",strerror(errno),errno);
-        exit(0);
-    }
-    if( listen(listenfd, 10) == -1){
-        printf("listen socket error: %s(errno: %d)\n",strerror(errno),errno);
-        exit(0);
-    }
+    listenfd = unix_socket_server_init(unix_socket_name,&servaddr,5);
     max_fd = listenfd;
 
     struct sortArray *client_fds;
@@ -98,7 +106,7 @@ int main(int argc, char** argv)
         printf("max_fd=%d, client=%d\n",max_fd,client_fds->array[client_fds->count]);
 
         memset(&tm,0,sizeof(tm));
-        tm.tv_sec = 4;
+        tm.tv_sec = 16;
 
         ret = select(max_fd+1,&rd_set,NULL,NULL,NULL);
         if(ret < 0)
@@ -135,7 +143,7 @@ int main(int argc, char** argv)
         {
             len = read(connfd,buff,MAXLINE);
             if(len > 0)
-                printf("recv msg from client: %s\n", buff);
+                handler_event((struct event_msg *)buff);
             else if(len == 0)
             {
                 printf("recv len=%d, error=%d::%s\n", len,errno,strerror(errno));

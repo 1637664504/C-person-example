@@ -38,6 +38,7 @@ static int get_ping_result(const char *cmd)
     int ret;
 
     ret = system(cmd);
+    printf("ret=%d cmd=%s\n",ret,cmd);
 
     return ret;
 }
@@ -76,7 +77,6 @@ unsigned int run_link_ping_thread(struct ping_option *opt)
     unsigned int score = 0;
 
     for(i=0; i<g_website_num; i++){
-
         strncpy(thread[i].opt.ifcname, opt->ifcname, sizeof(thread[i].opt.website)-1);
         strncpy(thread[i].opt.website, ping_website[i], sizeof(thread[i].opt.website)-1);
         thread[i].opt.timeout = opt->timeout;
@@ -98,6 +98,13 @@ unsigned int run_link_ping_thread(struct ping_option *opt)
     return score;
 }
 
+int handler_internet_result(const char ifcname,unsigned int score)
+{
+    struct route_option opt;
+    oem_fill_route_option(&opt,ifcname,score);
+    set_default_route(&opt);
+}
+
 //Detect link network status
 int detect_link_internet(const char* ifcname)
 {
@@ -117,26 +124,41 @@ int detect_link_internet(const char* ifcname)
             break;
         }
     }
+    handler_internet_result(ifcname,score);
     
     return score;
 }
 
+void main_loop()
+{
+   char buf[256];
+   char link[16];
+   while(1)
+   {
+        memset(buf,0,sizeof(buf));
+        //1.get event
+        //fgets(buf, sizeof(buf)-1, stdin);
+        scanf("%s",buf);
+        if(strcmp(buf,"exit") == 0)
+        {
+            break;
+        }
+
+        if(strstr(buf,"eth"))
+        {
+            strncpy(link,buf,sizeof(link)-1);
+            detect_link_internet(link);
+        }
+        else
+            printf("unknow cmd\n");
+
+   }
+}
+
 int main(int argc, char** argv)
 {
-    int ret = -1;
-    unsigned int score = 0;
 
-    if(argc != 2)
-    {
-        printf("usage: %s ifcname",argv[0]);
-        exit(-1);
-    }
-
-    score = detect_link_internet(argv[1]);
-    if(score > 0)
-        ret = 0;
-
-    printf("ret=%d score=%u",ret,score);
+    main_loop();
     
-    return ret;
+    return 0;
 }

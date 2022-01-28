@@ -104,15 +104,31 @@ void array_dump(int a[],int len)
     printf("\n");
 }
 
+static void array_show(int a[],unsigned int len)
+{
+	unsigned int i;
+	for(i=0;i<len;i++)
+	{
+        printf("%0.2x ",a[i]);
+        if(i%15 == 0 && i)
+            printf("\n");
+	}
+	printf("\n");
+}
+
+#define UNIT_TEST 1
 #if UNIT_TEST
 int main(void)
 {
     int array[16]={1,3,5,7,9};
     int number = 8;
-    array_show(array,5);
-    array_insert_sort(array,5,4);
-    array_del_sort(array,6,4);
-    array_show(array,6);
+    array_show(array,15);
+	array_move_right(&array[0],2);
+	array_show(array,15);
+    
+    //array_insert_sort(ar=ray,5,4);
+    //array_del_sort(array,6,4);
+    //array_show(array,6);
     return 0;
 }
 #endif
