@@ -7,13 +7,12 @@
 #include <arpa/inet.h>
 #include <errno.h>
 
-int jrd_sys_get_wan_ip(char *wan_ip, int size)
+int get_link_ip(char *address,unsigned int len)
 {
     int sock = 0;
     struct ifreq ifr;
-    int wan_type = 0;
     
-    if (wan_ip == NULL || size < 16)
+    if (address == NULL || size < 16)
     {
         return -1;
     }
@@ -25,13 +24,14 @@ int jrd_sys_get_wan_ip(char *wan_ip, int size)
     }
 
     memset(&ifr,0,sizeof(ifr));
-    strcpy(ifr.ifr_name, "eth1");
+    strcpy(ifr.ifr_name, "ppp0");
     if (ioctl(sock, SIOCGIFADDR, &ifr) <  0)
     {
         printf("ioctl get addr fail: %s\n",strerror(errno));
         return 0;
     }
-    strncpy(wan_ip,inet_ntoa(((struct sockaddr_in*)&(ifr.ifr_addr))->sin_addr),size);
+    strncpy(address,inet_ntoa(((struct sockaddr_in*)&(ifr.ifr_addr))->sin_addr),size);
+    close(sock);
 
     return 0;
 }
