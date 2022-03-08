@@ -1,15 +1,12 @@
 #include <stdio.h>
 #include <string.h>
-#include <arpa/inet.h>
 
 #define NAMESERVER_FILE	    "resolv.conf"
-void manual_set_nameserver(const char nameserver_list[][64],unsigned int list_size)
+void sys_network_set_nameserver(const char nameserver_list[][64],unsigned int list_size)
 {
-    char buf[256];
     unsigned int i;
     FILE *fp = fopen(NAMESERVER_FILE, "w");
 
-    memset(buf,'\0',sizeof(buf));
     for(i=0;i<list_size;i++)
     {
         if(strlen(nameserver_list[i]))
@@ -20,6 +17,6 @@ void manual_set_nameserver(const char nameserver_list[][64],unsigned int list_si
 
 int main(void)
 {
-    char dns[4][64]={"223.5.5.5","8.8.8.8","8.8.4.4"};
-    manual_set_nameserver(dns,4);
+    char dns[4][64]={"223.5.5.5","8.8.8.8","2001:4860:4860::8888","2001:4860:4860::8844"};
+    sys_network_set_nameserver(dns,4);
 }

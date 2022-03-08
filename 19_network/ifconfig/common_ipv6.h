@@ -1,0 +1,2 @@
+#define SRC_IP6_ADDR_STRING 0
+#define SRC_IP6_IN6_ADDR 1

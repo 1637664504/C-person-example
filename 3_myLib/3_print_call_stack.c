@@ -1,3 +1,9 @@
+/*
+打印函数名:
+-g -rdynamic
+
+*/
+
 #include <stdio.h>
 #include <execinfo.h>
 
@@ -6,6 +12,7 @@ void printStack(void)
 {
     void *trace[STACK_SIZE];
 	size_t size = backtrace(trace, STACK_SIZE);
+    printf("size=%u\n", size);
 	char **symbols = (char **)backtrace_symbols(trace,size);
 	size_t i = 0;
 	for(; i<size; i++)
@@ -17,19 +24,19 @@ void printStack(void)
 
 void fun3(void)
 {
-    printf("3333");
+    printf("3333\n");
     printStack();
 }
 
 void fun2(void)
 {
-    printf("2222");
+    printf("2222\n");
     fun3();
 }
 
 void fun1(void)
 {
-    printf("11111");
+    printf("11111\n");
     fun2();
 }
 
