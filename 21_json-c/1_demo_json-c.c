@@ -1,7 +1,13 @@
 #include <stdio.h>
 #include <json-c/json.h>
-int
-main ()
+/*
+生成json 
+{
+  "str1":"test string ",
+  "array1":["china","English","Australia","French"]
+ }
+*/
+int main ()
 {
   int ret;
   //(1)创建

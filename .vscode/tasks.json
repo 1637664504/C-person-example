@@ -12,13 +12,8 @@
                 "-g","-Wall"
                 "-ljson-c",
                 "-lpthread",
-                "-lnl-3","-I/usr/include/libnl3",
             ],
-            //*/
-            /*
-            "command": "make",
-            "args": ["all"],
-            */
+
             "options": {
                 "cwd": "${fileDirname}"
             },
