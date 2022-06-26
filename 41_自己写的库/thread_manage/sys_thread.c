@@ -3,19 +3,19 @@
 #include <fcntl.h>
 #include "sys_thread.h"
 
-int thread_manage_init(struct thread_manage *thread)
+int thread_manage_init(struct thread_manage *thread, void(*thead_fun)(void *arg))
 {
     int ret = 0;
 
     pthread_mutex_init(&thread->mutex, NULL);
     pthread_cond_init(&thread->cond, NULL);
     thread->state = thread_invalid;
+    thread->fun = thead_fun;
 
     thread->run = thread_manage_run;
     thread->stop = thread_manage_stop;
     thread->suspend = thread_manage_suspend;
     thread->wakeup = thread_manage_wakeup;
-    thread->init = thread_manage_init;
 
     return ret;
 }
