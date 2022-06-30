@@ -10,7 +10,7 @@
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}.out",
                 "-g","-Wall"
-                "-ljson-c",
+                //"-ljson-c",
                 "-lpthread",
             ],
 
