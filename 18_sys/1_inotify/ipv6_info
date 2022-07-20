@@ -1,0 +1,3 @@
+address 240e:47c:30a0:f86f:a8bb:ccff:fe77:8899/64
+getway fe80::fc5d:99ff:fe5e:432a
+dns fe80::fc5d:99ff:fe5e:432a
