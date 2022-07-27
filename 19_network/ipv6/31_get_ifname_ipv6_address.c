@@ -1,3 +1,7 @@
+/*
+参考busybox ifconfig实现
+
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

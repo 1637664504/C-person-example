@@ -45,7 +45,6 @@ void getcmd(struct thread_manage *mg)
 
 int main(int argc,const char *argv[])
 {
-    printf("111\n");
     struct thread_manage mg;
     thread_manage_init(&mg);
 

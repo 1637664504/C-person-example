@@ -1,3 +1,8 @@
+/*
+自己写的ipv4有效性判断
+通过字符串格式解析
+*/
+
 #include <stdio.h>
 #include <string.h>
 

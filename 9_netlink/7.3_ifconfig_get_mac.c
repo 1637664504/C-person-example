@@ -19,7 +19,7 @@ int get_link_mac_by_ifname(const char *ifname, char *data, enum mac_type type)
         unsigned char mac[IFHWADDRLEN]={0};
         inet_sock = socket(AF_INET, SOCK_DGRAM, 0);
  
-        strcpy(ifr.ifr_name, "eth2");
+        strcpy(ifr.ifr_name, ifname);
         //SIOCGIFADDR标志代表获取接口地址
         if (ioctl(inet_sock, SIOCGIFHWADDR, &ifr) <  0)
                 perror("ioctl");
@@ -27,7 +27,7 @@ int get_link_mac_by_ifname(const char *ifname, char *data, enum mac_type type)
         
         memcpy(mac, ifr.ifr_hwaddr.sa_data, IFHWADDRLEN);
         if(type == raw_mac_type)
-                printf("1111");
+                printf("to do");
         else if(type ==  string_mac_type)
         printf("Interface eth2: %.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",
             //*mac, *(mac+1), *(mac+2), *(mac+3), *(mac+4), *(mac+5));
@@ -40,3 +40,9 @@ int main()
         get_link_mac_by_ifname("eth1",mac,string_mac_type);
         return 0;
 }
+/*
+注意:
+部分虚拟网络接口无MAC，如:
+ppp, gretap
+
+*/

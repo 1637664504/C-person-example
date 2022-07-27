@@ -1,3 +1,11 @@
+/*
+1.此代码参考busybox ifconfig实现, 读取与解析 /proc/net/dev
+
+to do
+ip link(即netlink)也可以获取此参数，尝试使用ip link获取
+
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
