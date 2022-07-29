@@ -3,3 +3,4 @@ a.out
 go/*
 *.o
 *.out
+tmp/*

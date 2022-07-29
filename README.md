@@ -51,6 +51,22 @@ ifreq获取网络接口ethx 的ip，mac，status: [get_ifc_status.c](19_network\
 
 
 
+## 4.数据结构
 
+#### 1.list
+
+链表增，遍历，反向  [list_test.c](41_自己写的库\list\list_test.c) 
+
+#### 2.queue
+
+to do
+
+
+
+## 5.字符操作
+
+1.itoa() int转字符  [11_my_itoa_int转字符串.c](16_string\11_my_itoa_int转字符串.c) 
+
+2.sscanf 字符解析汇总 
 
 ---
