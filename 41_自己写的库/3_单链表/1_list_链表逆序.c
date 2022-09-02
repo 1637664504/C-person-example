@@ -2,38 +2,28 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
 struct listNode{
 	int val;
 	struct listNode *next;
 };
 
-#if 0
-//3个变量
-void list_revert(struct listNode *head)
+void list_revert(struct listNode **head)
 {
-	struct listNode *now,*pre,*next;
-	now = head;
-	pre = NULL;
+	struct listNode *now,*prev,*next;
+	now = *head;
+	prev = NULL;
 	next = NULL;
 	while(now)
 	{
-		if(now->next)
-		{
-			next = now->next;
-			now->next = pre;
+		next = now->next;
+		now->next = prev;
 
-			now = next;
-			pre = now;
-		}
-		else
-		{
-			now->next = pre;
-			break;
-		}
+		prev = now;
+		now = next;
 	}
+
+	*head = prev;
 }
-#endif
 
 /*
 链表 初始化
@@ -42,7 +32,10 @@ int list_init(struct listNode **head,int a[],int len)
 {
 	struct listNode *now = NULL, *prev = NULL;
 
-#ifdef way1	//方法1
+#ifdef way1
+/*
+方法1: 画草图逻辑实现
+*/
 	if(len)
 	{
 		now = malloc(sizeof(struct listNode));
@@ -60,9 +53,7 @@ int list_init(struct listNode **head,int a[],int len)
 		now = malloc(sizeof(struct listNode));
 		if(now)
 		{
-			//if(prev)
-				prev->next = now;
-
+			prev->next = now;
 			now->val = a[i];
 			now->next = NULL;
 			prev = now;
@@ -71,7 +62,11 @@ int list_init(struct listNode **head,int a[],int len)
 			return -1;
 		}
 	}
-#else		//方法2
+#elif way2
+/*
+方法2: 
+i=0时判断的处理
+*/
 	for(int i=0;i<len;i++)
 	{
 		now = malloc(sizeof(struct listNode));
@@ -93,6 +88,26 @@ int list_init(struct listNode **head,int a[],int len)
 			return -1;
 		}
 	}
+#else	//way3
+/*
+方法3: 
+参考链表逆序实现，i=len-1; i>=0; i-- 顺序调换
+*/
+	for(int i=len-1; i>=0; i--)
+	{
+		now = malloc(sizeof(struct listNode));
+		if(now)
+		{
+			now->val = a[i];
+			now->next = prev;
+			prev = now;
+		}
+		else{
+			return -1;
+		}
+	}
+
+	*head = now;
 #endif
 
 	return 0;
@@ -154,7 +169,7 @@ void list_show(struct listNode *head)
 	{
 		if(now->next)
 		{
-			printf("%d ",now->val);
+			printf("%d \n",now->val);
 			now=now->next;
 		}
 		else
@@ -172,6 +187,10 @@ int main(void)
 	//list_rinit(&head,a,5);
 	list_init(&head,a,5);
 	list_show(head);
+
+	list_revert(&head);
+	list_show(head);
+
 	list_free(head);
 
 	return 0;
