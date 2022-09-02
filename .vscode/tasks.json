@@ -12,6 +12,7 @@
                 "-g","-Wall"
                 //"-ljson-c",
                 "-lpthread",
+                "-lm",
             ],
 
             "options": {
