@@ -13,6 +13,10 @@
 
  [sys_thread.c](29_thread_pthread\lib\sys_thread.c) 
 
+#### 2.读写锁
+
+ [4_rwlock_自己实现读写锁.c](29_thread_pthread\rwlock读写锁\4_rwlock_自己实现读写锁.c)  [3_rwlock_写读测试.c](29_thread_pthread\rwlock读写锁\3_rwlock_写读测试.c) 
+
 
 
 ## 2.事件
