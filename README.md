@@ -1,6 +1,14 @@
 # C-person-example
 个人C语言验证总结
 
+编译器: gcc
+
+测试环境：ubuntu debain
+
+IDE：vscode + c/c++插件 + gdb
+
+代码风格：1.C99特性 变量需要时，在创建与初始化，限定代码的作用访问，减少阅读代码心智负担。2.GNU风格。
+
 
 
 # **有价值的实例**
@@ -37,7 +45,13 @@
 
 监听多文件变化实例：  [2_inotify_two_file.c](18_sys/1_inotify/2_inotify_two_file.c)   [3_inotify_实例.c](18_sys/1_inotify/3_inotify_实例.c) 
 
-select/poll/epoll 监听文件变化：to do
+
+
+#### 3.select epoll IO多路监听复用
+
+epoll实例 [2_epoll_服务端.c](19_network/epoll/2_epoll_服务端.c) 
+
+select实例  [1_socket_server.c](19_network/socket/1_server_client/1_socket_server.c)  [3_AF_UNXI_socket_server.c](19_network/socket/1_server_client/3_AF_UNXI_socket_server.c) 
 
 
 
