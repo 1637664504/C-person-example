@@ -9,8 +9,7 @@
                 "${file}",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}.out",
-                "-g","-Wall"
-                //"-ljson-c",
+                "-g","-Wall",
                 "-lpthread",
                 "-lm",
             ],
