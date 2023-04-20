@@ -1,8 +1,9 @@
 
 /* 
-按键事件 == linux input事件
+linux input事件
 参考 https://blog.csdn.net/l435799304/article/details/107469795
 
+按键、键盘、触摸屏和鼠标等输入设备 
  */
 #include <stdio.h>
 #include <unistd.h>
