@@ -4,3 +4,6 @@ go/*
 *.o
 *.out
 tmp/*
+
+# scons
+*.sconsign.dblite
