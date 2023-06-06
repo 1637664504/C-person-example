@@ -4,6 +4,8 @@
 #include <mqueue.h>
 #include <signal.h>
 #include <string.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 mqd_t mq_id;
 char buf[8192];
@@ -25,7 +27,7 @@ static void signal_handler(int signo) {
 
 int main() {
 	//创建消息队列
-    mq_id = mq_open("/tmp/notify",O_RDONLY | O_CREAT, 0666, NULL);
+    mq_id = mq_open("/notify",O_RDONLY | O_CREAT, 0666, NULL);
     if (mq_id == -1) 
     {
         perror("mq_open failed");

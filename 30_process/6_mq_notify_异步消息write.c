@@ -3,11 +3,13 @@
 #include <unistd.h>
 #include <mqueue.h>
 #include <string.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 int main () {
     mqd_t mq_id;
     //打开创建好的消息队列
-	mq_id = mq_open("/tmp/notify",O_WRONLY | O_CREAT, 0666, NULL);
+	mq_id = mq_open("/notify",O_WRONLY | O_CREAT, 0666, NULL);
 	if (mq_id == -1) {
         perror("mq_open failed");
         exit(-1);
