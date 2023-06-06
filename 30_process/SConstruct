@@ -1,0 +1,7 @@
+
+env = Environment()
+env['CCFLAGS'] = '-lrt -ggdb3 -O0'
+env['LIBS'] = '-lrt'
+
+env.Program('5_mq_notify_异步消息read.out', '5_mq_notify_异步消息read.c')
+env.Program('6_mq_notify_异步消息write.out', '6_mq_notify_异步消息write.c')
