@@ -1,7 +1,9 @@
 {
     "files.exclude": {
         "**/.git": true,
-        "**/.out": true,
+        "**/*.out": true,
+        "**/*.o": true,
+        "**/.sconsign.dblite": true,
     },
     "search.exclude": {
         "**/.git": true,

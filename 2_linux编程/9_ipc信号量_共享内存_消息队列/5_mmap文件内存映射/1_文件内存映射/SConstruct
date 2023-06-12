@@ -1,7 +1,6 @@
 
 env = Environment()
-env['CCFLAGS'] = '-lrt -ggdb3 -O0'
-env['LIBS'] = '-lrt'
+env['CCFLAGS'] = '-ggdb3 -O0 -Wall'
 
 env.Program('1_mmap_write.out', '1_mmap_write.c')
 env.Program('2_mmap_read.out', '2_mmap_read.c')

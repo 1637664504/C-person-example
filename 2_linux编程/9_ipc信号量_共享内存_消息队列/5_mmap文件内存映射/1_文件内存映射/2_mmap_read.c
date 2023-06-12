@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
             printf("buf=%s\n", buf);
         }
     }
-        munmap(ptr, PAGE_SIZE);
+    munmap(ptr, PAGE_SIZE);
 
     return 0;
 }
