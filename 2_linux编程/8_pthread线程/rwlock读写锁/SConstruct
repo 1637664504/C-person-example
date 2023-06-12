@@ -1,0 +1,6 @@
+
+env = Environment()
+
+env['CCFLAGS'] = '-ggdb3 -O0 -Wall'
+env['LIBS'] = '-lpthread'
+env.Program('5_rwlock_读写锁_带输入命令测试.out', '5_rwlock_读写锁_带输入命令测试.c')
