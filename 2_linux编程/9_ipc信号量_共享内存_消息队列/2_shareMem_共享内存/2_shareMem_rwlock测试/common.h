@@ -1,0 +1,2 @@
+#define KEY_SHAREMEM 7788
+#define SHAREMEM_SIZE 1024

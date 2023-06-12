@@ -1,0 +1,7 @@
+
+env = Environment()
+env['CCFLAGS'] = '-ggdb3 -O0 -Wall'
+env['LIBS'] = '-lpthread'
+
+env.Program('1_sharemem_wlock读写锁_写实例.out', '1_sharemem_wlock读写锁_写实例.c')
+env.Program('2_sharemem_rwlock_读写锁_读实例.out', '2_sharemem_rwlock_读写锁_读实例.c')
