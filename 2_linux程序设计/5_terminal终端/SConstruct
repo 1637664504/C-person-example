@@ -1,3 +1,0 @@
-# src_files=Split('1_输入不按回车_立即生效.c')
-src_files = ['1_输入不按回车_立即生效.c']
-Program('a.out', src_files)

@@ -1,9 +1,17 @@
 {
+    "files.exclude": {
+        "**/.git": true,
+        "**/.out": true,
+    },
+    "search.exclude": {
+        "**/.git": true,
+        "**/.out": true,
+    },
     "C_Cpp.errorSquiggles": "Disabled",
     "files.associations": {
         "inotify.h": "c",
         "stdlib.h": "c",
         "array": "c",
         "pthread.h": "c"
-    }
+    },
 }
