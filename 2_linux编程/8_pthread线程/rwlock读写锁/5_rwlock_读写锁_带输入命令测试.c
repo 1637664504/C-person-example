@@ -2,8 +2,9 @@
 #include <time.h>
 #include <stdio.h>
 #include <unistd.h>
+#include "common.h"
 
-pthread_rwlock_t rwlock;
+pthread_rwlock_t *rwlock;
 void* thread_read(void* arg)
 {
     int id = *(int*)arg;
