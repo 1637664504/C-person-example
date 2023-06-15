@@ -1,0 +1,8 @@
+
+env = Environment()
+env['CCFLAGS'] = ' -ggdb3 -O0 -Wall'
+# env['LIBS'] = '-lrt'
+
+env.Program('1_semget_信号量_pv基本实例.out', '1_semget_信号量_pv基本实例.c')
+env.Program('2_sem信号量_多进程同步.out', '2_sem信号量_多进程同步.c')
+env.Program('3_sem_生产_消费_现做菜模型.out', '3_sem_生产_消费_现做菜模型.c')
