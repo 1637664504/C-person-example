@@ -1,0 +1,5 @@
+
+DefaultEnvironment(CCFLAGS = '-g -O0')
+
+Program('5_结构体对齐.out', '5_结构体对齐.c')
+Program('6_内存对齐测试.out', '6_内存对齐测试.c')
