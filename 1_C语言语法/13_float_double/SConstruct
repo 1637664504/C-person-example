@@ -1,0 +1,4 @@
+
+DefaultEnvironment(CCFLAGS = '-g -O0 -Wall')
+
+Program('1_float_原始值查看.out', '1_float_原始值查看.c')
