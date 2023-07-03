@@ -3,6 +3,8 @@
 #include <string.h>
 #include <time.h>
 #include <sys/stat.h>
+#include <errno.h>
+
 
 int main ( int argc, char *argv[] )
 {
@@ -17,8 +19,11 @@ int main ( int argc, char *argv[] )
     struct stat fp_stat;
 
     ret = stat(file,&fp_stat);
-    if(ret)
+    if (ret)
+    {
+        printf("open fail %d=%s\n",errno, strerror(errno));
         return -1;
+    }
 
     int mode = fp_stat.st_mode;
     printf("st_mode=%x\n",fp_stat.st_mode);

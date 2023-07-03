@@ -1,0 +1,7 @@
+# clang编译器
+env = Environment(tools = ['default', 'clang'])
+env['CC']=['clang']
+env['CXX']=['clang++']
+
+src=['2_stat.c']
+env.Program('2_stat.out', src)
