@@ -18,7 +18,7 @@ int main ( int argc, char *argv[] )
     int ret = 0;
     struct stat fp_stat;
 
-    ret = stat(file,&fp_stat);
+    ret = stat(file, &fp_stat);
     if (ret)
     {
         printf("open fail %d=%s\n",errno, strerror(errno));

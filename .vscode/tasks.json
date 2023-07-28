@@ -9,7 +9,7 @@
                 "${file}",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}.out",
-                "-g","-Wall",
+                "-ggdb3","-O0","-Wall",
                 "-lpthread",
                 "-lm",
             ],
