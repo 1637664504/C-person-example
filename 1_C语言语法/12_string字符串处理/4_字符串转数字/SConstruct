@@ -1,0 +1,5 @@
+
+Program('1_atoi_atol_atoll_atof_strtol_strtof_strtod_字符转数字.out', '1_atoi_atol_atoll_atof_strtol_strtof_strtod_字符转数字.c')
+Program('4_strtol_字符串转16进制.out', '4_strtol_字符串转16进制.c')
+Program('5_sscanf_字符串转16进制.out', '5_sscanf_字符串转16进制.c')
+Program('10_atof_字符转float.out', '10_atof_字符转float.c')
