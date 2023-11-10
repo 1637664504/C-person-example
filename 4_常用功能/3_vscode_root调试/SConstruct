@@ -1,0 +1,5 @@
+env = Environment()
+env['CCFLAGS'] = '-ggdb3 -O0'
+
+src=Split("1_vscode_root_sudo调试.c")
+env.Program('1_vscode_root_sudo调试.out', src)
