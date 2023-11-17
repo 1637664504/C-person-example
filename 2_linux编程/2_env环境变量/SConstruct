@@ -1,0 +1,6 @@
+env = Environment()
+env['CCFLAGS'] = '-ggdb3 -O0'
+
+src=Split("6_setlimit资源限制.c")
+env.Program('6_setlimit资源限制.out', src)
+env.Program('test.out', src)
