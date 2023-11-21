@@ -22,4 +22,5 @@ def build_out(src_file):
 env['CCFLAGS'] = ' -ggdb3 -O0'         # gdb 调试开关
 # env['CCFLAGS'] += ' -DDEBUG'          # Debug log开关
 
-build_out("demo.c")
+build_out("1_stdarg_可变参数.c")
+build_out("2_stdarg_可变参数_末尾添加换行.c")
