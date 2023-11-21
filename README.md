@@ -96,3 +96,13 @@ to do
 ### 1.按键事件检查 --linux input事件
 按键、键盘、触摸屏和鼠标等输入设备 属于input事件
 ---
+
+
+
+# 7.通用库
+
+## 1.日志库
+
+syslog日志库封装 [libxlog.c](4_常用功能\2_Log_C日志库\1_syslog_日志库\libxlog.c)  [libxlog.h](4_常用功能\2_Log_C日志库\1_syslog_日志库\libxlog.h) 
+
+- http, mqtt 转发日志
