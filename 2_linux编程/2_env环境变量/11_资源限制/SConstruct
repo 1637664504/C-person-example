@@ -1,0 +1,4 @@
+env = Environment()
+env['CCFLAGS'] = '-ggdb3 -O0'
+
+env.Program('1_进程绑定cpu核心_cpu_set.out', "1_进程绑定cpu核心_cpu_set.c")
