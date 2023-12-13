@@ -1,4 +1,8 @@
 env = Environment()
 env['CCFLAGS'] = '-ggdb3 -O0'
+env['LIBS'] = ['pthread']
 
 env.Program('1_进程绑定cpu核心_cpu_set.out', "1_进程绑定cpu核心_cpu_set.c")
+env.Program('1_cgroup_限制cpu使用率.out', "1_cgroup_限制cpu使用率.c")
+env.Program('2_cgroup_限制mem.out', "2_cgroup_限制mem.c")
+env.Program('3_cgroup_同时限制cpu_mem.out', "3_cgroup_同时限制cpu_mem.c")
