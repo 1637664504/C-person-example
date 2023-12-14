@@ -15,3 +15,6 @@ env['CCFLAGS'] = ' -ggdb3 -O0'         # gdb 调试开关
 
 env.Program('1_gettimeofday_获取毫秒时间戳.out', Split("1_gettimeofday_获取毫秒时间戳.c"))
 env.Program('2_gettimeofday_获取当前时间.out', Split("2_gettimeofday_获取当前时间.c"))
+env.Program('3_time_日期_时间.out', '3_time_日期_时间.c')
+env.Program('11_usleep_毫秒级别延时.out', '11_usleep_毫秒级别延时.c')
+env.Program('12_nanosleep_纳秒延时.out', '12_nanosleep_纳秒延时.c')

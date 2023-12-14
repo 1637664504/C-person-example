@@ -1,0 +1,4 @@
+env = Environment()
+env['CCFLAGS'] = '-ggdb3 -O0'
+
+env.Program('1_environ_遍历env.out', '1_environ_遍历env.c')
