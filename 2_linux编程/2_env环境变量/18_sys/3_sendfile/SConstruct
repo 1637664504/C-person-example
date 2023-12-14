@@ -1,0 +1,3 @@
+env = Environment()
+env['CCFLAGS'] = ' -ggdb3 -O0'
+env.Program('1_sendfile_文件输出到终端.out', '1_sendfile_文件输出到终端.c')

@@ -22,7 +22,8 @@
                     "ignoreFailures": true
                 }
             ],
-            "miDebuggerPath": "/usr/bin/gdb"
+            "miDebuggerPath": "/usr/bin/gdb",
+            // "miDebuggerServerAddress": "127.0.0.1:6699"
         }
     ]
 }
