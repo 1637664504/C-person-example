@@ -6,5 +6,8 @@ go/*
 *.out
 tmp/*
 
+# self
+*.log
+
 # scons
 *.sconsign.dblite

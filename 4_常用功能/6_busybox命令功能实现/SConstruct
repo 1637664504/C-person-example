@@ -1,0 +1,5 @@
+
+env = Environment()
+env['CCFLAGS'] = ' -ggdb3 -O0'         # gdb 调试开关
+
+env.Program("tee.out","tee.c")
