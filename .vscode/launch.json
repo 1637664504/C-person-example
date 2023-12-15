@@ -20,7 +20,18 @@
                     "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
-                }
+                },
+                {
+                    "description": "调试子进程",
+                    // "text": "set follow-fork-mode parent",     //parent 调试父进程--默认
+                    "text": "set follow-fork-mode child",   //child 调试子进程
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "同时调试多进程",
+                    "text": "set detach-on-fork off",
+                    "ignoreFailures": true
+                },
             ],
             "miDebuggerPath": "/usr/bin/gdb",
             // "miDebuggerServerAddress": "127.0.0.1:6699"
