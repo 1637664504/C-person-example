@@ -1,3 +1,4 @@
+## 模板1
 import os
 
 env = None
@@ -18,3 +19,10 @@ src_list = [
 
 for src in src_list:
     env.Program(Split(src))
+
+
+## 模板2
+env = Environment()
+env["PROGSUFFIX"] = ".out"            # 可执行后缀.out
+env["CCFLAGS"] = " -ggdb3 -O0 -Wall"  # gdb 调试开关
+env.Program("demo.c")
