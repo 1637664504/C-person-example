@@ -9,7 +9,8 @@
         "**/*.out": true,
         "**/*.o": true,
         "**/.sconsign.dblite": true,
-        "**/*.log": true
+        "**/*.log": true,
+        "**/*.img": true
     },
     "search.exclude": {
         "**/.git": true,

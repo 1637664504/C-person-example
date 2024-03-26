@@ -10,8 +10,9 @@ struct client_info{
 
 int main()
 {
-    struct client_info *tmp;
-    tmp = malloc(sizeof(*tmp)+sizeof(int)*10);
+    struct client_info* tmp;
+    printf("struct client_info size=%lu\n",sizeof(struct client_info));
+    tmp = malloc(sizeof(*tmp) + sizeof(int) * 10);
     tmp->count = 10;
 
     for(int i=0;i<tmp->count;i++){

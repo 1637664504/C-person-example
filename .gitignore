@@ -11,3 +11,4 @@ tmp/*
 
 # scons
 *.sconsign.dblite
+*.img
