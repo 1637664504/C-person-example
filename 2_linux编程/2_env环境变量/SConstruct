@@ -1,0 +1,9 @@
+env = Environment()
+env['CCFLAGS'] = '-ggdb3 -O0'
+
+src=Split("6_setlimit资源限制.c")
+env.Program('6_setlimit资源限制.out', src)
+
+src=Split("6_setlimit资源限制.c")
+env.Program('7_nice_getpriority_setpriority_修改优先级.out', src)
+env.Program('8_mktemp_临时文件.out', '8_mktemp_临时文件.c')

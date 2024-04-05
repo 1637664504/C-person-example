@@ -1,0 +1,3 @@
+env = Environment()
+env['CCFLAGS'] = '-g3 -O0'
+env.Program('1_segment_fault.out', '1_segment_fault.c')

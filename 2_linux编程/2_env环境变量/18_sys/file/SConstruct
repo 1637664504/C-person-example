@@ -1,7 +1,21 @@
-# clang编译器
-env = Environment(tools = ['default', 'clang'])
-env['CC']=['clang']
-env['CXX']=['clang++']
+## 模板1
+import os
 
-src=['2_stat.c']
-env.Program('2_stat.out', src)
+env = None
+# 1.编译器
+if os.system("which clang"):
+    env = Environment()
+else:
+    # clang编译器
+    env = Environment(tools=["default", "clang"])
+    env["CC"] = ["clang"]
+    env["CXX"] = ["clang++"]
+
+env["PROGSUFFIX"] = ".out"            # 可执行后缀.out
+env["CCFLAGS"] = " -ggdb3 -O0 -Wall"  # gdb 调试开关
+src_list = [
+    "11_stat_获取文件大小.c",
+]
+
+for src in src_list:
+    env.Program(Split(src))

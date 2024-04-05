@@ -22,13 +22,13 @@ IDE：vscode  c/c++插件,  gdb
 
 #### 1.线程休眠/唤醒库，实现线程同步
 
- [thread_manage_test.c](2_linux编程\8_pthread线程\24_thread_manage_test\thread_manage_test.c) 
+ [thread_manage_test.c](29_thread_pthread/24_thread_manage_test/thread_manage_test.c)
 
- [sys_thread.c](2_linux编程\8_pthread线程\thread_manage\sys_thread.c) 
+ [sys_thread.c](29_thread_pthread/lib/sys_thread.c)
 
 #### 2.读写锁
 
- [1_rwlock_读写锁实例.c](2_linux编程\8_pthread线程\rwlock读写锁\1_rwlock_读写锁实例.c) 
+ [4_rwlock_自己实现读写锁.c](29_thread_pthread/rwlock读写锁/4_rwlock_自己实现读写锁.c)  [3_rwlock_写读测试.c](29_thread_pthread/rwlock读写锁/3_rwlock_写读测试.c)
 
  [2_rwlock_读写读测试.c](2_linux编程\8_pthread线程\rwlock读写锁\2_rwlock_读写读测试.c) 
 
@@ -39,43 +39,27 @@ IDE：vscode  c/c++插件,  gdb
 
 #### 1.netlink 监听内核事件实例
 
-监听网卡拔插事件：
+监听网卡拔插事件： [3.2_netlink_link_down_up.c](9_netlink/3.2_netlink_link_down_up.c)  [5.1_network_monitor_link_UpDwon.c](9_netlink/5.1_network_monitor_link_UpDwon.c)
 
- [3.2_netlink_link_down_up.c](5_第3方库\9_netlink\3.2_netlink_link_down_up.c) 
+监听USB拔插事件： [1_usb_hotplug.c](9_netlink/1_usb_hotplug.c)
 
- [5.1_network_monitor_link_UpDwon.c](5_第3方库\9_netlink\5.1_network_monitor_link_UpDwon.c) 
-
-监听USB拔插事件：
-
- [1_usb_hotplug.c](5_第3方库\9_netlink\1_usb_hotplug.c) 
-
-监听网络事件: ip,route变更：
-
- [2_netlink_uevent.c](5_第3方库\9_netlink\2_netlink_uevent.c) 
-
- [3.1_netlink_route.c](5_第3方库\9_netlink\3.1_netlink_route.c) 
+监听网络事件: ip,route变更： [3.1_netlink_route.c](9_netlink/3.1_netlink_route.c)
 
 
 
 #### 2.inotify 监听文件状态变化
 
-监听单文件变化：
+监听单文件变化： [1_inotify_one_file.c](18_sys/1_inotify/1_inotify_one_file.c)
 
- [1_inotify_one_file.c](2_linux编程\2_env环境变量\18_sys\1_inotify\1_inotify_one_file.c) 
-
-监听多文件变化实例：
-
- [3_inotify_实例.c](2_linux编程\2_env环境变量\18_sys\1_inotify\3_inotify_实例.c) 
-
- [2_inotify_two_file.c](2_linux编程\2_env环境变量\18_sys\1_inotify\2_inotify_two_file.c) 
+监听多文件变化实例：  [2_inotify_two_file.c](18_sys/1_inotify/2_inotify_two_file.c)   [3_inotify_实例.c](18_sys/1_inotify/3_inotify_实例.c)
 
 
 
 #### 3.select epoll IO多路监听复用
 
-epoll实例 
+epoll实例 [2_epoll_服务端.c](19_network/epoll/2_epoll_服务端.c)
 
- [2_epoll_服务端.c](2_linux编程\25_网络编程\19_network\epoll\2_epoll_服务端.c) 
+select实例  [1_socket_server.c](19_network/socket/1_server_client/1_socket_server.c)  [3_AF_UNXI_socket_server.c](19_network/socket/1_server_client/3_AF_UNXI_socket_server.c)
 
  [1_server_epoll.c](2_linux编程\25_网络编程\19_network\epoll\1_server_epoll.c) 
 
@@ -99,27 +83,11 @@ select实例
 
 #### 1.网络设备操作
 
-ifreq获取网络接口ethx 的ip，mac，status:
-
- [1_get_ifc_status.c](2_linux编程\25_网络编程\19_network\ifreq\1_get_ifc_status.c) 
-
- [2_get_interface_mac.c](2_linux编程\25_网络编程\19_network\interface\2_get_interface_mac.c) 
-
- [1.1_ifconfig_get_stats.c](2_linux编程\25_网络编程\19_network\interface\1.1_ifconfig_get_stats.c) 
-
- [1_get_sys_net_device_stats.c](2_linux编程\25_网络编程\19_network\interface\1_get_sys_net_device_stats.c) 
-
- [4.2_link_get_tx_rx_statistics.c](2_linux编程\25_网络编程\19_network\4.2_link_get_tx_rx_statistics.c) 
-
- [4.1_get_link_ipMaskGwHwFlagsMtu.c](2_linux编程\25_网络编程\19_network\4.1_get_link_ipMaskGwHwFlagsMtu.c) 
+ifreq获取网络接口ethx 的ip，mac，status: [get_ifc_status.c](19_network/ifreq/1_get_ifc_status.c)  [1_get_sys_net_device_stats.c](19_network/interface/1_get_sys_net_device_stats.c)  [4.1_get_link_ipMaskGwHwFlagsMtu.c](19_network/4.1_get_link_ipMaskGwHwFlagsMtu.c)  [4.2_link_get_tx_rx_statistics.c](19_network/4.2_link_get_tx_rx_statistics.c)
 
 #### 2.ipv6
 
-获取网络接口的ipv6地址与地址类型:
-
- [32_get_ipv6_address_type.c](2_linux编程\25_网络编程\19_network\ipv6\32_get_ipv6_address_type.c) 
-
- [31_get_ifname_ipv6_address.c](2_linux编程\25_网络编程\19_network\ipv6\31_get_ifname_ipv6_address.c) 
+获取网络接口的ipv6地址与地址类型: [31_get_ifname_ipv6_address.c](19_network/ipv6/31_get_ifname_ipv6_address.c)
 
 测试ipv4/ipv6地址使用有效:
 
@@ -131,7 +99,7 @@ ifreq获取网络接口ethx 的ip，mac，status:
 
 #### 1.list
 
-链表增，遍历，反向  
+链表增，遍历，反向  [list_test.c](41_自己写的库/list/list_test.c)
 
  [test_list.c](3_算法_数据结构\1_list链表\test_list.c) 
 
@@ -139,7 +107,7 @@ ifreq获取网络接口ethx 的ip，mac，status:
 
 #### 2.queue
 
-Todo
+ [1_unorder_array_无序数组.c](41_自己写的库/4_无序数组/1_unorder_array_无序数组.c)
 
 #### 3.自定义数据: 无序数组
 
@@ -147,11 +115,10 @@ Todo
 
 ## 5.字符操作
 
-1.itoa() int转字符  
+1.itoa() int转字符  [11_my_itoa_int转字符串.c](16_string/11_my_itoa_int转字符串.c)
 
- [11_my_itoa_int转字符串.c](1_C语言语法\12_string字符串处理\11_my_itoa_int转字符串.c) 
-
-2.sscanf 字符解析汇总 
+2.sscanf 字符解析汇总
+- snprintf float长度限定 [3_snprintf_限定float长度.c](1_C语言语法/12_string字符串处理/3_sprintf_字符串格式化/3_snprintf_限定float长度.c)
 
  [15.3_sscanf.c](1_C语言语法\12_string字符串处理\15.3_sscanf.c) 
 
@@ -176,3 +143,13 @@ Todo
 ### 1.按键事件检查 --linux input事件
 按键、键盘、触摸屏和鼠标等输入设备 属于input事件
 ---
+
+
+
+# 7.通用库
+
+## 1.日志库
+
+syslog日志库封装 [libxlog.c](4_常用功能\2_Log_C日志库\1_syslog_日志库\libxlog.c)  [libxlog.h](4_常用功能\2_Log_C日志库\1_syslog_日志库\libxlog.h)
+
+- http, mqtt 转发日志

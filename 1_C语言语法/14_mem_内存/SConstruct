@@ -1,0 +1,19 @@
+import os
+
+env = None
+# 1.编译器
+if os.system("which clang"):
+    env = Environment()
+else:
+    # clang编译器
+    env = Environment(tools = ['default', 'clang'])
+    env['CC']=['clang']
+    env['CXX']=['clang++']
+
+env['CCFLAGS'] = ' -ggdb3 -O0 --std=c99'         # gdb 调试开关
+# env['CCFLAGS'] += ' -DDEBUG'          # Debug log开关
+
+# env.Program('1_memmem.out', '1_memmem.c')
+env.Program('2_memchr_二进制搜索字符.out', '2_memchr_二进制搜索字符.c')
+env.Program('3_memmove_内存移动.out', '3_memmove_内存移动.c')
+env.Program('21_memstr_内存搜索字符串.out', '21_memstr_内存搜索字符串.c')

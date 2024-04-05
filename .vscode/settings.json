@@ -1,9 +1,16 @@
 {
     "files.exclude": {
         "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
         "**/*.out": true,
         "**/*.o": true,
         "**/.sconsign.dblite": true,
+        "**/*.log": true,
+        "**/*.img": true
     },
     "search.exclude": {
         "**/.git": true,
@@ -15,6 +22,17 @@
         "stdlib.h": "c",
         "array": "c",
         "pthread.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "optional": "c",
+        "istream": "c",
+        "ostream": "c",
+        "ratio": "c",
+        "system_error": "c",
+        "functional": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "variant": "c"
     },
+    "explorerExclude.backup": {},
 }

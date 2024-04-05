@@ -1,0 +1,4 @@
+env = Environment()
+env['CCFLAGS'] = '-ggdb3 -O0'
+
+env.Program('1_getlogin_获取当前用户.out', '1_getlogin_获取当前用户.c')

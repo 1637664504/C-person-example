@@ -4,10 +4,10 @@
 
 int main ( int argc, char *argv[] )
 {
-    char buf[32] = "123";
-    int num = atol(buf);
+    char buf[32] = "ff";
+    int num;
 
-    printf("num=%d\n", num);
+    printf("num=%ld\n",strtol(buf, NULL, 16));
 
     return 0;
 }
